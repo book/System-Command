@@ -17,6 +17,8 @@ for my $handle (qw( stdin stdout stderr )) {
     ok( $cmd->$handle->opened, "$handle opened" );
 }
 
+is_deeply( [ $cmd->cmdline ], [ $^X, $name ], 'cmdline' );
+
 # get the output
 my $output = join '', $cmd->stdout->getlines();
 my $info;
