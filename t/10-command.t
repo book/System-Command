@@ -18,6 +18,7 @@ for my $handle (qw( stdin stdout stderr )) {
 }
 
 is_deeply( [ $cmd->cmdline ], [ $^X, $name ], 'cmdline' );
+is_deeply( $cmd->options, {}, 'options' );
 
 # get the output
 my $output = join '', $cmd->stdout->getlines();
