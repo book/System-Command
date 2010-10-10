@@ -13,7 +13,7 @@ use List::Util qw( reduce );
 our $VERSION = '1.00';
 
 # a few simple accessors
-for my $attr (qw( pid stdin stdout stderr exit signal core )) {
+for my $attr (qw( pid stdin stdout stderr exit signal core options )) {
     no strict 'refs';
     *$attr = sub { return $_[0]{$attr} };
 }
@@ -78,6 +78,7 @@ sub new {
     # create the object
     return bless {
         cmdline => [ @cmd ],
+        options => $o,
         pid     => $pid,
         stdin   => $in,
         stdout  => $out,
