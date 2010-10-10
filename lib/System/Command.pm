@@ -2,25 +2,105 @@ package System::Command;
 
 use warnings;
 use strict;
+use 5.006;
 
-=head1 NAME
+use Carp;
+use Cwd qw( cwd );
+use IO::Handle;
+use IPC::Open3 qw( open3 );
 
-System::Command - The great new System::Command!
+our $VERSION = '1.00';
 
-=head1 VERSION
+# a few simple accessors
+for my $attr (qw( pid stdin stdout stderr exit signal core )) {
+    no strict 'refs';
+    *$attr = sub { return $_[0]{$attr} };
+}
+for my $attr (qw( cmdline )) {
+    no strict 'refs';
+    *$attr = sub { return @{ $_[0]{$attr} } };
+}
 
-Version 0.01
+sub new {
+    my ( $class, @cmd ) = @_;
 
-=cut
+    # split the args
+    my $o;
+    @cmd = grep { !( ref eq 'HASH' ? $o ||= $_ : 0 ) } @cmd;
+    $o ||= {};
 
-our $VERSION = '0.01';
+    # chdir to the expected directory
+    my $orig = cwd;
+    my $dest = defined $o->{cwd} ? $o->{cwd} : undef;
+    if ( defined $dest ) {
+        chdir $dest or croak "Can't chdir to $dest: $!";
+    }
 
+    # keep changes to the environment local
+    local %ENV = %ENV;
 
-=head1 SYNOPSIS
+    # update the environment
+    @ENV{ keys %{ $o->{env} } } = values %{ $o->{env} }
+        if exists $o->{env};
 
-Quick summary of what the module does.
+    # start the command
+    my ( $in, $out, $err );
+    $err = Symbol::gensym;
+    my $pid = eval { open3( $in, $out, $err, @cmd ); };
 
-Perhaps a little code snippet.
+    # FIXME - better check open3 error conditions
+    croak $@ if !defined $pid;
+
+    # some input was provided
+    if ( defined $o->{input} ) {
+        local $SIG{PIPE}
+            = sub { croak "Broken pipe when writing to: @cmd" };
+        print {$in} $o->{input} if length $o->{input};
+        $in->close;
+    }
+
+    # chdir back to origin
+    if ( defined $dest ) {
+        chdir $orig or croak "Can't chdir back to $orig: $!";
+    }
+
+    # create the object
+    return bless {
+        cmdline => [ @cmd ],
+        pid     => $pid,
+        stdin   => $in,
+        stdout  => $out,
+        stderr  => $err,
+    }, $class;
+}
+
+sub close {
+    my ($self) = @_;
+
+    # close all pipes
+    my ( $in, $out, $err ) = @{$self}{qw( stdin stdout stderr )};
+    $in->opened  and $in->close  || carp "error closing stdin: $!";
+    $out->opened and $out->close || carp "error closing stdout: $!";
+    $err->opened and $err->close || carp "error closing stderr: $!";
+
+    # and wait for the child
+    waitpid $self->{pid}, 0;
+
+    # check $?
+    @{$self}{qw( exit signal core )} = ( $? >> 8, $? & 127, $? & 128 );
+
+    return $self;
+}
+
+sub DESTROY {
+    my ($self) = @_;
+    $self->close if !exists $self->{exit};
+}
+
+1;
+
+__END__
+
 
     use System::Command;
 
