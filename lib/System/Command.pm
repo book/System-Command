@@ -8,6 +8,7 @@ use Carp;
 use Cwd qw( cwd );
 use IO::Handle;
 use IPC::Open3 qw( open3 );
+use List::Util qw( reduce );
 
 our $VERSION = '1.00';
 
@@ -25,9 +26,19 @@ sub new {
     my ( $class, @cmd ) = @_;
 
     # split the args
-    my $o;
-    @cmd = grep { !( ref eq 'HASH' ? $o ||= $_ : 0 ) } @cmd;
-    $o ||= {};
+    my @o;
+    @cmd = grep { !( ref eq 'HASH' ? push @o, $_ : 0 ) } @cmd;
+
+    # merge the option hashes
+    my $o = reduce {
+        {
+            %$a, %$b,
+                exists $a->{env} && exists $b->{env}
+                ? ( env => { %{ $a->{env} }, %{ $b->{env} } } )
+                : ()
+        };
+    }
+    @o;
 
     # chdir to the expected directory
     my $orig = cwd;
