@@ -1,6 +1,7 @@
 #!perl
 use strict;
 use warnings;
+use Cwd qw( cwd );
 use Data::Dumper;
 
 print Data::Dumper->Dump(
@@ -8,6 +9,7 @@ print Data::Dumper->Dump(
             pid  => $$,
             argv => \@ARGV,
             env  => \%ENV,
+            cwd  => cwd(),
         }
     ],
     ['info']

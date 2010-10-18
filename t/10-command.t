@@ -2,14 +2,20 @@ use strict;
 use warnings;
 use Test::More;
 use File::Spec;
+use File::Temp qw( tempdir );
+use Cwd qw( cwd abs_path );
 use System::Command;
 
-my $name = File::Spec->catfile( t => 'info.pl' );
+my $dir   = abs_path( tempdir( CLEANUP => 1 ) );
+my $cwd   = cwd;
+my $name  = File::Spec->catfile( t => 'info.pl' );
 my @tests = (
     {   cmdline => [ $^X, $name ],
+        cwd     => $cwd,
         options => {},
     },
     {   cmdline => [ $^X, $name, { name => 'zlonk' } ],
+        cwd     => $cwd,
         options => { name => 'zlonk' },
     },
     {   cmdline => [
@@ -19,13 +25,40 @@ my @tests = (
     },
     {   cmdline => [
             $^X, $name,
-            { env => { SYSTEM_COMMAND => 'System::Command' } },
-            { env => { OTHER_ENV      => 'something else'  } },
+            { env  => { SYSTEM_COMMAND => 'System::Command' } },
+            { name => 'zowie' },
         ],
+        cwd     => $cwd,
+        options => {
+            env  => { SYSTEM_COMMAND => 'System::Command' },
+            name => 'zowie'
+        },
+    },
+    {   cmdline => [
+            $^X,
+            File::Spec->catfile( $cwd => $name ),
+            { cwd => $dir, name => 'powie' },
+            { env => { SYSTEM_COMMAND => 'System::Command' } },
+        ],
+        cwd     => $dir,
+        name    => File::Spec->catfile( $cwd => $name ),
+        options => {
+            name => 'powie',
+            env  => { SYSTEM_COMMAND => 'System::Command' },
+            name => 'powie',
+            cwd  => $dir,
+        },
+    },
+    {   cmdline => [
+            $^X, $name,
+            { env => { SYSTEM_COMMAND => 'System::Command' } },
+            { env => { OTHER_ENV      => 'something else' } },
+        ],
+        cwd     => $cwd,
         options => {
             env => {
-                SYSTEM_COMMAND => 'System::Command',
                 OTHER_ENV      => 'something else',
+                SYSTEM_COMMAND => 'System::Command',
             }
         },
     },
@@ -59,9 +92,10 @@ for my $t (@tests) {
     is_deeply(
         $info,
         {   argv => [],
+            cwd  => $t->{options}{cwd} || $cwd,
             env  => { %ENV, %{ $t->{options}{env} || {} } },
             name => $t->{name} || $name,
-            pid  => $cmd->pid,
+            pid => $cmd->pid,
         },
         "perl $name"
     );
