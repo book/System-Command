@@ -58,6 +58,14 @@ my @tests = (
             }
         },
     },
+    {   cmdline => [
+            $^X,
+            $name,
+            { env => { 'SYSTEM_COMMAND_INPUT' => 1 }, input => 'test input' }
+        ],
+        options =>
+            { env => { 'SYSTEM_COMMAND_INPUT' => 1 }, input => 'test input' }
+    },
 );
 
 plan tests => 14 * @tests;
@@ -71,7 +79,14 @@ for my $t (@tests) {
     # test the handles
     for my $handle (qw( stdin stdout stderr )) {
         isa_ok( $cmd->$handle, 'GLOB' );
-        ok( $cmd->$handle->opened, "$handle opened" );
+        if ( $handle eq 'stdin' ) {
+            my $opened = !exists $t->{options}{input};
+            is( $cmd->$handle->opened, $opened,
+                "$handle @{[ !$opened && 'not ']}opened" );
+        }
+        else {
+            ok( $cmd->$handle->opened, "$handle opened" );
+        }
     }
 
     is_deeply( [ $cmd->cmdline ],
@@ -90,8 +105,9 @@ for my $t (@tests) {
         {   argv => [],
             cwd  => $t->{options}{cwd} || $cwd,
             env  => { %ENV, %{ $t->{options}{env} || {} } },
-            name => $t->{name} || $name,
-            pid => $cmd->pid,
+            input => $t->{options}{input} || '',
+            name  => $t->{name}           || $name,
+            pid   => $cmd->pid,
         },
         "perl $name"
     );
