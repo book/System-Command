@@ -7,17 +7,14 @@ use System::Command;
 my $name = File::Spec->catfile( t => 'info.pl' );
 my @tests = (
     {   cmdline => [ $^X, $name ],
-        name    => $name,
         options => {},
     },
     {   cmdline => [ $^X, $name, { name => 'zlonk' } ],
-        name    => 'zlonk',
         options => { name => 'zlonk' },
     },
     {   cmdline => [
             $^X, $name, { env => { SYSTEM_COMMAND => 'System::Command' } }
         ],
-        name    => $name,
         options => { env => { SYSTEM_COMMAND => 'System::Command' } },
     },
     {   cmdline => [
@@ -25,7 +22,6 @@ my @tests = (
             { env => { SYSTEM_COMMAND => 'System::Command' } },
             { env => { OTHER_ENV      => 'something else'  } },
         ],
-        name    => $name,
         options => {
             env => {
                 SYSTEM_COMMAND => 'System::Command',
@@ -59,12 +55,12 @@ for my $t (@tests) {
     eval $output;
 
     is_deeply(
-        {   pid  => $cmd->pid,
-            argv => [],
-            name => $name,
-            env  => { %ENV, %{ $t->{options}{env} || {} } },
-        },
         $info,
+        {   argv => [],
+            env  => { %ENV, %{ $t->{options}{env} || {} } },
+            name => $t->{name} || $name,
+            pid  => $cmd->pid,
+        },
         "perl $name"
     );
 
