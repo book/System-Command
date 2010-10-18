@@ -11,11 +11,9 @@ my $cwd   = cwd;
 my $name  = File::Spec->catfile( t => 'info.pl' );
 my @tests = (
     {   cmdline => [ $^X, $name ],
-        cwd     => $cwd,
         options => {},
     },
     {   cmdline => [ $^X, $name, { name => 'zlonk' } ],
-        cwd     => $cwd,
         options => { name => 'zlonk' },
     },
     {   cmdline => [
@@ -28,7 +26,6 @@ my @tests = (
             { env  => { SYSTEM_COMMAND => 'System::Command' } },
             { name => 'zowie' },
         ],
-        cwd     => $cwd,
         options => {
             env  => { SYSTEM_COMMAND => 'System::Command' },
             name => 'zowie'
@@ -54,7 +51,6 @@ my @tests = (
             { env => { SYSTEM_COMMAND => 'System::Command' } },
             { env => { OTHER_ENV      => 'something else' } },
         ],
-        cwd     => $cwd,
         options => {
             env => {
                 OTHER_ENV      => 'something else',
