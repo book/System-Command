@@ -10,6 +10,29 @@ my @tests = (
         name    => $name,
         options => {},
     },
+    {   cmdline => [ $^X, $name, { name => 'zlonk' } ],
+        name    => 'zlonk',
+        options => { name => 'zlonk' },
+    },
+    {   cmdline => [
+            $^X, $name, { env => { SYSTEM_COMMAND => 'System::Command' } }
+        ],
+        name    => $name,
+        options => { env => { SYSTEM_COMMAND => 'System::Command' } },
+    },
+    {   cmdline => [
+            $^X, $name,
+            { env => { SYSTEM_COMMAND => 'System::Command' } },
+            { env => { OTHER_ENV      => 'something else'  } },
+        ],
+        name    => $name,
+        options => {
+            env => {
+                SYSTEM_COMMAND => 'System::Command',
+                OTHER_ENV      => 'something else',
+            }
+        },
+    },
 );
 
 plan tests => 13 * @tests;
