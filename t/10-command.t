@@ -4,35 +4,53 @@ use Test::More;
 use File::Spec;
 use System::Command;
 
-plan 'no_plan';
-
-# run a single command
 my $name = File::Spec->catfile( t => 'info.pl' );
-my $cmd = System::Command->new( $^X, $name );
-isa_ok( $cmd, 'System::Command' );
+my @tests = (
+    {   cmdline => [ $^X, $name ],
+        name    => $name,
+        options => {},
+    },
+);
 
-# test the handles
-for my $handle (qw( stdin stdout stderr )) {
-    isa_ok( $cmd->$handle, 'GLOB' );
-    ok( $cmd->$handle->opened, "$handle opened" );
+plan tests => 13 * @tests;
+
+for my $t (@tests) {
+
+    # run the command
+    my $cmd = System::Command->new( @{ $t->{cmdline} } );
+    isa_ok( $cmd, 'System::Command' );
+
+    # test the handles
+    for my $handle (qw( stdin stdout stderr )) {
+        isa_ok( $cmd->$handle, 'GLOB' );
+        ok( $cmd->$handle->opened, "$handle opened" );
+    }
+
+    is_deeply( [ $cmd->cmdline ],
+        [ grep { !ref } @{ $t->{cmdline} } ], 'cmdline' );
+    is_deeply( $cmd->options, $t->{options}, 'options' );
+
+    # get the output
+    my $output = join '', $cmd->stdout->getlines();
+    my $info;
+    eval $output;
+
+    is_deeply(
+        {   pid  => $cmd->pid,
+            argv => [],
+            name => $name,
+            env  => { %ENV, %{ $t->{options}{env} || {} } },
+        },
+        $info,
+        "perl $name"
+    );
+
+    # close and check
+    $cmd->close();
+    is( $cmd->exit,   0, 'exit 0' );
+    is( $cmd->signal, 0, 'no signal received' );
+    is( $cmd->core, $t->{core} || 0, 'no core dumped' );
 }
-
-is_deeply( [ $cmd->cmdline ], [ $^X, $name ], 'cmdline' );
-is_deeply( $cmd->options, {}, 'options' );
-
-# get the output
-my $output = join '', $cmd->stdout->getlines();
-my $info;
-eval $output;
-
-is_deeply( { pid => $cmd->pid, argv => [], name => $name },
-    $info, "perl $name" );
-
-# close and check
-$cmd->close();
-is( $cmd->exit,   0, 'exit 0' );
-is( $cmd->signal, 0, 'no signal received' );
-is( $cmd->core,   0, 'no core dumped' );
 
 # TODO
 # - test with options (cwd, input, env)
