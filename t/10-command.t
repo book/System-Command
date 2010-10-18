@@ -66,14 +66,34 @@ my @tests = (
         options =>
             { env => { 'SYSTEM_COMMAND_INPUT' => 1 }, input => 'test input' }
     },
+    {   cmdline => [
+            $^X, $name,
+            { env => { 'SYSTEM_COMMAND_INPUT' => 1 }, input => '' }
+        ],
+        options => { env => { 'SYSTEM_COMMAND_INPUT' => 1 }, input => '' }
+    },
+);
+my @fail = (
+    {   cmdline =>
+            [ $^X, $name, { cwd => File::Spec->catdir( $dir, 'nothere' ) } ],
+        cwd     => File::Spec->catdir( $dir, 'nothere' ),
+        fail    => qr/^Can't chdir to /,
+        options => {},
+    },
 );
 
-plan tests => 14 * @tests;
+plan tests => 14 * @tests + 2 * @fail;
 
-for my $t (@tests) {
+for my $t ( @tests, @fail ) {
 
     # run the command
-    my $cmd = System::Command->new( @{ $t->{cmdline} } );
+    my $cmd = eval { System::Command->new( @{ $t->{cmdline} } ) };
+    if ( $t->{fail} ) {
+        ok( !$cmd, 'command failed' );
+        like( $@, $t->{fail}, '... expected error message' );
+        next;
+    }
+
     isa_ok( $cmd, 'System::Command' );
 
     # test the handles
