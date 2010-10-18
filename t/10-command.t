@@ -13,9 +13,6 @@ my @tests = (
     {   cmdline => [ $^X, $name ],
         options => {},
     },
-    {   cmdline => [ $^X, $name, { name => 'zlonk' } ],
-        options => { name => 'zlonk' },
-    },
     {   cmdline => [
             $^X, $name, { env => { SYSTEM_COMMAND => 'System::Command' } }
         ],
@@ -24,11 +21,10 @@ my @tests = (
     {   cmdline => [
             $^X, $name,
             { env  => { SYSTEM_COMMAND => 'System::Command' } },
-            { name => 'zowie' },
+            { },
         ],
         options => {
             env  => { SYSTEM_COMMAND => 'System::Command' },
-            name => 'zowie'
         },
     },
     {   cmdline => [
@@ -42,7 +38,6 @@ my @tests = (
         options => {
             name => 'powie',
             env  => { SYSTEM_COMMAND => 'System::Command' },
-            name => 'powie',
             cwd  => $dir,
         },
     },
