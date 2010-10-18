@@ -31,11 +31,10 @@ sub new {
 
     # merge the option hashes
     my $o = reduce {
-        {
-            %$a, %$b,
-                exists $a->{env} && exists $b->{env}
-                ? ( env => { %{ $a->{env} }, %{ $b->{env} } } )
-                : ()
+        +{  %$a, %$b,
+            exists $a->{env} && exists $b->{env}
+            ? ( env => { %{ $a->{env} }, %{ $b->{env} } } )
+            : ()
         };
     }
     @o;
