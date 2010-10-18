@@ -31,7 +31,7 @@ my @tests = (
     },
 );
 
-plan tests => 13 * @tests;
+plan tests => 14 * @tests;
 
 for my $t (@tests) {
 
@@ -51,9 +51,11 @@ for my $t (@tests) {
 
     # get the output
     my $output = join '', $cmd->stdout->getlines();
+    my $errput = join '', $cmd->stderr->getlines();
+    is( $errput, '', 'no errput' );
+
     my $info;
     eval $output;
-
     is_deeply(
         $info,
         {   argv => [],
