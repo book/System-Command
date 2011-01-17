@@ -10,6 +10,8 @@ use IO::Handle;
 use IPC::Open3 qw( open3 );
 use List::Util qw( reduce );
 
+use System::Command::Reaper;
+
 our $VERSION = '1.00';
 
 # a few simple accessors
@@ -75,7 +77,7 @@ sub new {
     }
 
     # create the object
-    return bless {
+    my $self = bless {
         cmdline => [ @cmd ],
         options => $o,
         pid     => $pid,
@@ -83,30 +85,17 @@ sub new {
         stdout  => $out,
         stderr  => $err,
     }, $class;
-}
 
-sub close {
-    my ($self) = @_;
-
-    # close all pipes
-    my ( $in, $out, $err ) = @{$self}{qw( stdin stdout stderr )};
-    $in->opened  and $in->close  || carp "error closing stdin: $!";
-    $out->opened and $out->close || carp "error closing stdout: $!";
-    $err->opened and $err->close || carp "error closing stderr: $!";
-
-    # and wait for the child
-    waitpid $self->{pid}, 0;
-
-    # check $?
-    @{$self}{qw( exit signal core )} = ( $? >> 8, $? & 127, $? & 128 );
+    # create the subprocess reaper and link the handles and command to it
+    ${*$in} = ${*$out} = ${*$err} = $self->{reaper}    # typeglobs FTW
+        = System::Command::Reaper->new($self);
 
     return $self;
 }
 
-sub DESTROY {
-    my ($self) = @_;
-    $self->close if !exists $self->{exit};
-}
+
+# delegate close() to the reaper
+sub close { $_[0]{reaper}->reap() }
 
 1;
 
