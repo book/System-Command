@@ -131,9 +131,9 @@ System::Command - Object for running system commands
 
 =head1 DESCRIPTION
 
-C<System::Command> is a class that actually launches an external system
-commands, allowing to interact with it through its C<STDIN>, C<STDOUT>
-and C<STDERR>.
+C<System::Command> is a class that launches external system commands
+and return an object representing them, allowing to interact with them
+through their C<STDIN>, C<STDOUT> and C<STDERR> handles.
 
 =head1 METHODS
 
@@ -167,18 +167,15 @@ without writing to it.
 Using C<undef> as C<input> will not do anything. This behaviour provides
 a way to modify previous options populated by some other part of the program.
 
-On some systems, some git commands may close standard input on startup,
+On some systems, some commands may close standard input on startup,
 which will cause a SIGPIPE when trying to write to it. This will raise
 an exception.
 
 =back
 
-If the C<Git::Repository> object has its own option hash, it will be used
-to provide default values that can be overriden by the actual option hash
-passed to C<new()>.
-
 If several option hashes are passed to C<new()>, they will be merged
-together with values being overriden by hashes that appear later in the list.
+together with individual values being overriden by those (with the same
+key) from hashes that appear later in the list.
 
 The C<System::Command> object returned by C<new()> has a number of
 attributes defined (see below).
@@ -186,15 +183,9 @@ attributes defined (see below).
 
 =head2 close()
 
-Close all pipes to the child process, and collects exit status, etc.
+Close all pipes to the child process, collects exit status, etc.
 and defines a number of attributes (see below).
 
-Note that C<close()> is automatically called when the
-C<System::Command> object is destroyed.
-Annoyingly, this means that in the following example C<$fh> will be
-closed when you tried to use it:
-
-    my $fh = System::Command->new( @cmd )->stdout;
 
 =head2 Accessors
 
@@ -215,7 +206,7 @@ The merged list of options used to run the command.
 
 =item pid()
 
-The PID of the underlying B<git> command.
+The PID of the underlying command.
 
 =item stdin()
 
@@ -231,13 +222,22 @@ A filehandle opened in read mode to the child process' standard error output.
 
 =back
 
+Regarding the handles to the child process, note that in the following code:
+
+    my $fh = System::Command->new( @cmd )->stdout;
+
+C<$fh> is opened and points to the output handle of the child process,
+while the anonymous C<System::Command> object has been destroyed. Once
+C<$fh> is destroyed, the subprocess will be reaped, thus avoiding zombies.
+
+
 After the call to C<close()>, the following attributes will be defined:
 
 =over 4
 
 =item exit()
 
-The exit status of the underlying B<git> command.
+The exit status of the underlying command.
 
 =item core()
 
@@ -260,6 +260,9 @@ C<Git::Repository::Command> during my talk at OSDC.fr 2010, asked
 why it was not an independent module. This module was started by
 taking out of C<Git::Repository::Command> 1.08 the parts that
 weren't related to Git.
+
+The C<System::Command::Reaper> class was added after the addition
+of C<Git::Repository::Command::Reaper> in C<Git::Repository::Command> 1.11.
 
 
 =head1 BUGS
