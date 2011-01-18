@@ -5,6 +5,7 @@ use File::Spec;
 use File::Temp qw( tempdir );
 use Cwd qw( cwd abs_path );
 use System::Command;
+use constant MSWin32 => $^O eq 'MSWin32';
 
 my $dir   = abs_path( tempdir( CLEANUP => 1 ) );
 my $cwd   = cwd;
@@ -115,11 +116,14 @@ for my $t ( @tests, @fail ) {
 
     my $info;
     eval $output;
+    my $w32env = {};
+    $w32env = { PWD => $t->{options}{cwd} }
+        if MSWin32 && exists $t->{options}{cwd};
     is_deeply(
         $info,
         {   argv => [],
             cwd  => $t->{options}{cwd} || $cwd,
-            env  => { %ENV, %{ $t->{options}{env} || {} } },
+            env  => { %ENV, %{ $t->{options}{env} || {} }, %$w32env },
             input => $t->{options}{input} || '',
             name  => $t->{name}           || $name,
             pid   => $cmd->pid,
