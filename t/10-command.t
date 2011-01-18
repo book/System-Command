@@ -134,9 +134,3 @@ for my $t ( @tests, @fail ) {
     is( $cmd->core, $t->{core} || 0, 'no core dumped' );
 }
 
-# TODO
-# - test with options (cwd, input, env)
-# - test with "native" programs (not "$^X info.pl")
-# - test with multiple option hashes
-# - test with full path
-
