@@ -1,15 +1,36 @@
-System-Command
+NAME
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+System::Command - Object for running system commands
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
+SYNOPSIS
+
+    use System::Command;
+
+    # invoke an external command, and return an object
+    $cmd = System::Command->new( @cmd );
+
+    # options can be passed as a hashref
+    $cmd = System::Command->new( @cmd, \%option );
+
+    # $cmd is basically a hash, with keys / accessors
+    $cmd->stdin();     # filehandle to the process' stdin (write)
+    $cmd->stdout();    # filehandle to the process' stdout (read)
+    $cmd->stderr();    # filehandle to the process' stdout (read)
+    $cmd->pid();       # pid of the child process
+
+    # done!
+    $cmd->close();
+
+    # exit information
+    $cmd->exit();      # exit status
+    $cmd->signal();    # signal
+    $cmd->core();      # core dumped? (boolean)
+
+DESCRIPTION
+
+System::Command is a class that launches external system commands and
+return an object representing them, allowing to interact with them
+through their "STDIN", "STDOUT" and "STDERR" handles.
 
 
 INSTALLATION
