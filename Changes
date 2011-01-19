@@ -1,5 +1,8 @@
 Revision history for System-Command
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+1.00 Wed Jan 20 00:50:17 CET 2011
+        [FEATURES]
+        - Generic version of the Git::Repository::Command process spawner
+        [BUGS]
+        - No work has been put on the Win32 version yet.
 

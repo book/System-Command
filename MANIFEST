@@ -8,9 +8,9 @@ README
 t/00-load.t
 t/10-command.t
 t/15-scope.t
-t/boilerplate.t
 t/info.pl
 t/lines.pl
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+META.yml
