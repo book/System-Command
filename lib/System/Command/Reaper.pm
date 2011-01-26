@@ -7,6 +7,7 @@ use 5.006;
 use Carp;
 use Scalar::Util qw( weaken );
 
+use constant MSWin32 => $^O eq 'MSWin32';
 use constant HANDLES => qw( stdin stdout stderr );
 use constant STATUS  => qw( exit signal core );
 
@@ -28,9 +29,28 @@ sub reap {
 
     # close all pipes
     my ( $in, $out, $err ) = @{$self}{qw( stdin stdout stderr )};
-    $in  and $in->opened  and $in->close  || carp "error closing stdin: $!";
-    $out and $out->opened and $out->close || carp "error closing stdout: $!";
-    $err and $err->opened and $err->close || carp "error closing stderr: $!";
+    if (MSWin32) {
+        $in
+            and $in->opened
+            and shutdown( $in, 2 ) || carp "error closing stdin: $!";
+        $out
+            and $out->opened
+            and shutdown( $out, 2 ) || carp "error closing stdout: $!";
+        $err
+            and $err->opened
+            and shutdown( $err, 2 ) || carp "error closing stderr: $!";
+    }
+    else {
+        $in
+            and $in->opened
+            and $in->close || carp "error closing stdin: $!";
+        $out
+            and $out->opened
+            and $out->close || carp "error closing stdout: $!";
+        $err
+            and $err->opened
+            and $err->close || carp "error closing stderr: $!";
+    }
 
     # and wait for the child
     waitpid $self->{pid}, 0;

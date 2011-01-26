@@ -10,6 +10,13 @@ use IO::Handle;
 use IPC::Open3 qw( open3 );
 use List::Util qw( reduce );
 
+# MSWin32 support
+use constant MSWin32 => $^O eq 'MSWin32';
+if ( MSWin32 ) {
+    require Socket;
+    import Socket qw( AF_UNIX SOCK_STREAM PF_UNSPEC );
+}
+
 use System::Command::Reaper;
 
 our $VERSION = '1.00';
@@ -56,9 +63,7 @@ sub new {
         if exists $o->{env};
 
     # start the command
-    my ( $in, $out, $err );
-    $err = Symbol::gensym;
-    my $pid = eval { open3( $in, $out, $err, @cmd ); };
+    my ( $pid, $in, $out, $err ) = _spawn( @cmd );
 
     # FIXME - better check open3 error conditions
     croak $@ if !defined $pid;
@@ -96,6 +101,48 @@ sub new {
 
 # delegate close() to the reaper
 sub close { $_[0]{reaper}->reap() }
+
+# private function to spawn subprocesses
+sub _spawn {
+    my @cmd = @_;
+    my ( $pid, $in, $out, $err );
+
+    if (MSWin32) {
+
+        # code from: http://www.perlmonks.org/?node_id=811650
+        # discussion at: http://www.perlmonks.org/?node_id=811057
+        local ( *IN_R,  *IN_W );
+        local ( *OUT_R, *OUT_W );
+        local ( *ERR_R, *ERR_W );
+        _pipe( *IN_R,  *IN_W )  or croak "input pipe error: $^E";
+        _pipe( *OUT_R, *OUT_W ) or croak "output pipe error: $^E";
+        _pipe( *ERR_R, *ERR_W ) or croak "errput pipe error: $^E";
+
+        $pid = eval { open3( '>&IN_R', '<&OUT_W', '<&ERR_W', @cmd ); };
+        ( $in, $out, $err ) = ( *IN_W{IO}, *OUT_R{IO}, *ERR_R{IO} );
+    }
+    else {
+        $err = Symbol::gensym;
+        $pid = eval { open3( $in, $out, $err, @cmd ); };
+    }
+
+    return ( $pid, $in, $out, $err );
+}
+
+sub _pipe {
+    socketpair( $_[0], $_[1], AF_UNIX(), SOCK_STREAM(), PF_UNSPEC() )
+        or return undef;
+
+    # turn off buffering
+    $_[0]->autoflush(1);
+    $_[1]->autoflush(1);
+
+    # half-duplex
+    shutdown( $_[0], 1 );    # No more writing for reader
+    shutdown( $_[1], 0 );    # No more reading for writer
+
+    return 1;
+}
 
 1;
 
