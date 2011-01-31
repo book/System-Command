@@ -1,5 +1,9 @@
 Revision history for System-Command
 
+1.01 Tue Feb  1 00:13:33 CET 2011
+        [FEATURES]
+        - new shortcut class method: spawn()
+
 1.00 Wed Jan 20 00:50:17 CET 2011
         [FEATURES]
         - Generic version of the Git::Repository::Command process spawner

@@ -12,7 +12,7 @@ use List::Util qw( reduce );
 
 use System::Command::Reaper;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 # a few simple accessors
 for my $attr (qw( pid stdin stdout stderr exit signal core options )) {
