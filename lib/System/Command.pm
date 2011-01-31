@@ -93,6 +93,11 @@ sub new {
     return $self;
 }
 
+sub spawn {
+    my ( $class, @cmd ) = @_;
+    return @{ System::Command->new(@cmd) }{qw( pid stdin stdout stderr )};
+}
+
 
 # delegate close() to the reaper
 sub close { $_[0]{reaper}->reap() }
@@ -128,6 +133,9 @@ System::Command - Object for running system commands
     $cmd->exit();      # exit status
     $cmd->signal();    # signal
     $cmd->core();      # core dumped? (boolean)
+
+    # cut to the chase
+    my ( $pid, $in, $out, $err ) = System::Command->spawn(@cmd);
 
 =head1 DESCRIPTION
 
@@ -185,6 +193,13 @@ attributes defined (see below).
 
 Close all pipes to the child process, collects exit status, etc.
 and defines a number of attributes (see below).
+
+
+=head2 spawn( @cmd )
+
+This shortcut method calls C<new()> (and so accepts options in the same
+manner) and directly returns the C<pid>, C<stdin>, C<stdout> and C<stderr>
+attributes, in that order.
 
 
 =head2 Accessors
