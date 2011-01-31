@@ -110,7 +110,6 @@ is( shift @destroyed,  $reap_addr, "... reaper object was destroyed" );
 
 # test 6
 BEGIN { $tests += 6 }
-SKIP:
 {
     my $cmd = System::Command->new( @cmd, 1, 2, 2, 1 );
     $cmd_addr  = refaddr $cmd;
@@ -139,5 +138,27 @@ ERR
 is( scalar @destroyed, 2,          "Destroyed 2 objects" );
 is( shift @destroyed,  $cmd_addr,  "... command object was destroyed" );
 is( shift @destroyed,  $reap_addr, "... reaper object was destroyed" );
+@destroyed = ();
+
+# test 7
+BEGIN { $tests += 4 }
+{
+    my ( $pid, $in, $out, $err ) = System::Command->spawn( @cmd, 1, 2, 2, 1 );
+    is( scalar @destroyed, 1, "Destroyed command object" );
+    shift @destroyed;
+    my $errput = join '', <$err>;
+    my $output = join '', <$out>;
+    is( $output, << 'OUT', 'scope: spawn()' );
+STDOUT line 1
+STDOUT line 2
+STDOUT line 3
+OUT
+    is( $errput, << 'ERR', 'scope: spawn()' );
+STDERR line 1
+STDERR line 2
+STDERR line 3
+ERR
+}
+is( scalar @destroyed, 1, "Destroyed reaper object" );
 @destroyed = ();
 
