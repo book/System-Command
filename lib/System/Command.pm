@@ -110,7 +110,8 @@ sub is_terminated {
 
     # If that is a re-animated body, we're gonna have to kill it.
     if ( my $reaped = waitpid( $pid, WNOHANG ) ) {
-        @{$self}{ STATUS() } = ( $? >> 8, $? & 127, $? & 128 );
+        @{$self}{ STATUS() } = @{ $self->{reaper} }{ STATUS() }
+            = ( $? >> 8, $? & 127, $? & 128 );
         return $reaped;    # It's dead, Jim!
     }
 
