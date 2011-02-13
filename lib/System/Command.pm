@@ -146,6 +146,12 @@ System::Command - Object for running system commands
     $cmd->stderr();    # filehandle to the process' stdout (read)
     $cmd->pid();       # pid of the child process
 
+    # find out if the child process died
+    if ( $cmd->is_terminated() ) {
+        # the handles are not closed yet
+        # but $cmd->exit() et al. are available
+    }
+
     # done!
     $cmd->close();
 
