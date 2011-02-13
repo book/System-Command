@@ -32,15 +32,16 @@ sub reap {
     $out and $out->opened and $out->close || carp "error closing stdout: $!";
     $err and $err->opened and $err->close || carp "error closing stderr: $!";
 
-    # and wait for the child
-    waitpid $self->{pid}, 0;
+    # and wait for the child (if any)
+    if ( waitpid( $self->{pid}, 0 ) > 0 ) {
 
-    # check $?
-    @{$self}{ STATUS() } = ( $? >> 8, $? & 127, $? & 128 );
+        # check $?
+        @{$self}{ STATUS() } = ( $? >> 8, $? & 127, $? & 128 );
 
-    # does our creator still exist?
-    @{ $self->{command} }{ STATUS() } = @{$self}{ STATUS() }
-        if defined $self->{command};
+        # does our creator still exist?
+        @{ $self->{command} }{ STATUS() } = @{$self}{ STATUS() }
+            if defined $self->{command};
+    }
 
     return $self;
 }
