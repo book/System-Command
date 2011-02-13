@@ -12,6 +12,9 @@ use List::Util qw( reduce );
 
 use System::Command::Reaper;
 
+use POSIX ":sys_wait_h";
+use constant STATUS  => qw( exit signal core );
+
 our $VERSION = '1.01';
 
 # a few simple accessors
@@ -98,6 +101,22 @@ sub spawn {
     return @{ System::Command->new(@cmd) }{qw( pid stdin stdout stderr )};
 }
 
+sub is_terminated {
+    my ($self) = @_;
+    my $pid = $self->{pid};
+
+    # Zed's dead, baby. Zed's dead.
+    return $pid if !kill 0, $pid;
+
+    # If that is a re-animated body, we're gonna have to kill it.
+    if ( my $reaped = waitpid( $pid, WNOHANG ) ) {
+        @{$self}{ STATUS() } = ( $? >> 8, $? & 127, $? & 128 );
+        return $reaped;    # It's dead, Jim!
+    }
+
+    # Look! It's moving. It's alive. It's alive...
+    return;
+}
 
 # delegate close() to the reaper
 sub close { $_[0]{reaper}->reap() }
@@ -195,6 +214,15 @@ Close all pipes to the child process, collects exit status, etc.
 and defines a number of attributes (see below).
 
 
+=head2 is_terminated()
+
+Returns a true value if the underlying process was terminated.
+
+If the process was indeed terminated, collects exit status, etc.
+and defines the same attributes as C<close()>, but does B<not> close
+all pipes to the child process,
+
+
 =head2 spawn( @cmd )
 
 This shortcut method calls C<new()> (and so accepts options in the same
@@ -246,7 +274,8 @@ while the anonymous C<System::Command> object has been destroyed. Once
 C<$fh> is destroyed, the subprocess will be reaped, thus avoiding zombies.
 
 
-After the call to C<close()>, the following attributes will be defined:
+After the call to C<close()> or after C<is_terminated()> returns true,
+the following attributes will be defined:
 
 =over 4
 
