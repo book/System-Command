@@ -27,6 +27,28 @@ for my $attr (qw( cmdline )) {
     *$attr = sub { return @{ $_[0]{$attr} } };
 }
 
+# a private sub-process spawning function
+my $_seq   = 0;
+my $_spawn = sub {
+    my (@cmd) = @_;
+    my ( $pid, $in, $out, $err );
+
+    # setup filehandles
+    {
+        no strict 'refs';
+        $in  = \do { local *{"IN$_seq"} };
+        $out = \do { local *{"OUT$_seq"} };
+        $err = \do { local *{"ERR$_seq"} };
+        $_seq++;
+    }
+
+    # start the command
+    $pid = eval { open3( $in, $out, $err, @cmd ); };
+
+    return ( $pid, $in, $out, $err );
+};
+
+# module methods
 sub new {
     my ( $class, @cmd ) = @_;
 
@@ -59,11 +81,9 @@ sub new {
         if exists $o->{env};
 
     # start the command
-    my ( $in, $out, $err );
-    $err = Symbol::gensym;
-    my $pid = eval { open3( $in, $out, $err, @cmd ); };
+    my ( $pid, $in, $out, $err ) = eval { $_spawn->(@cmd); };
 
-    # FIXME - better check open3 error conditions
+    # FIXME - better check error conditions
     croak $@ if !defined $pid;
 
     # some input was provided
