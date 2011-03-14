@@ -334,6 +334,17 @@ The signal, if any, that killed the command.
 
 =back
 
+=head1 CAVEAT EMPTOR
+
+Note that C<System::Command> uses C<waitpid()> to catch the status
+information of the child processes it starts. This means that if your
+code (or any module you C<use>) does something like the following:
+
+    local $SIG{CHLD} = 'IGNORE';    # reap child processes
+
+C<System::Command> will not be able to capture the C<exit>, C<core>
+and C<signal> attributes.
+
 =head1 AUTHOR
 
 Philippe Bruhat (BooK), C<< <book at cpan.org> >>
