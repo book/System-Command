@@ -140,7 +140,7 @@ sub is_terminated {
     my $pid = $self->{pid};
 
     # Zed's dead, baby. Zed's dead.
-    return $pid if !kill 0, $pid;
+    return $pid if !kill 0, $pid and defined $self->{exit};
 
     # If that is a re-animated body, we're gonna have to kill it.
     if ( my $reaped = waitpid( $pid, WNOHANG ) ) {
