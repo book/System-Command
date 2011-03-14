@@ -145,7 +145,9 @@ sub is_terminated {
     # If that is a re-animated body, we're gonna have to kill it.
     if ( my $reaped = waitpid( $pid, WNOHANG ) ) {
         @{$self}{ STATUS() } = @{ $self->{reaper} }{ STATUS() }
-            = ( $? >> 8, $? & 127, $? & 128 );
+            = $reaped == $pid
+            ? ( $? >> 8, $? & 127, $? & 128 )
+            : ( -1, -1, -1 );
         return $reaped;    # It's dead, Jim!
     }
 
@@ -343,7 +345,8 @@ code (or any module you C<use>) does something like the following:
     local $SIG{CHLD} = 'IGNORE';    # reap child processes
 
 C<System::Command> will not be able to capture the C<exit>, C<core>
-and C<signal> attributes.
+and C<signal> attributes. It will instead set all of them to the
+impossible value C<-1>.
 
 =head1 AUTHOR
 

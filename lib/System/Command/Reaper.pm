@@ -33,10 +33,13 @@ sub reap {
     $err and $err->opened and $err->close || carp "error closing stderr: $!";
 
     # and wait for the child (if any)
-    if ( waitpid( $self->{pid}, 0 ) > 0 ) {
+    if ( my $reaped = waitpid( $self->{pid}, 0 ) ) {
 
         # check $?
-        @{$self}{ STATUS() } = ( $? >> 8, $? & 127, $? & 128 );
+        @{$self}{ STATUS() }
+            = $reaped == $self->{pid}
+            ? ( $? >> 8, $? & 127, $? & 128 )
+            : ( -1, -1, -1 );
 
         # does our creator still exist?
         @{ $self->{command} }{ STATUS() } = @{$self}{ STATUS() }
