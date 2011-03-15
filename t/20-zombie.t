@@ -6,10 +6,26 @@ use File::Spec;
 
 my @cmd = ( $^X, File::Spec->catfile( t => 'fail.pl' ) );
 
-plan tests => 26;
+plan tests => 28;
 
 my $status = 1;
 my $delay  = 2;
+
+# catch warnings
+my $expect_CHLD_warning;
+$SIG{__WARN__} = sub {
+    my ($warning) = @_;
+    if ($expect_CHLD_warning) {
+        like(
+            $warning,
+            qr/^Child process already reaped, check for a SIGCHLD handler /,
+            'Warning about $SIG{CHLD}'
+        );
+    }
+    else {
+        ok( 0, "Unexpected warning: $warning" );
+    }
+};
 
 # just started the command
 my $cmd = System::Command->new( @cmd, $status, $delay );
@@ -35,6 +51,7 @@ ok( !$cmd->stderr->opened, 'stderr closed' );
 # what if our user decided to reap children automatically?
 diag q{$SIG{CHLD} = 'IGNORE'};
 local $SIG{CHLD} = 'IGNORE';
+$expect_CHLD_warning = 1;
 $cmd = System::Command->new( @cmd, $status, $delay );
 ok( !$cmd->is_terminated, 'child still alive' );
 is( $cmd->exit, undef, 'no exit status' );
