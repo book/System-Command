@@ -36,7 +36,7 @@ sub reap {
     if ( my $reaped = waitpid( $self->{pid}, 0 ) and !exists $self->{exit} ) {
         my $zed = $reaped == $self->{pid};
         carp "Child process already reaped, check for a SIGCHLD handler"
-            if !$zed;
+            if !$zed && !$System::Command::QUIET;
 
         # check $?
         @{$self}{ STATUS() }

@@ -26,6 +26,18 @@ BEGIN {
     open $REAL_STDERR, ">>&=".fileno(*STDERR);
 }
 
+our $QUIET = 0;
+
+sub import {
+    my ( $class, @args ) = @_;
+    my %arg = ( quiet => sub { $QUIET = 1 } );
+    for my $arg (@args) {
+        croak "Unknown parameter '$arg' in 'use System::Command'"
+            if !exists $arg{$arg};
+        $arg{$arg}->();
+    }
+}
+
 # a few simple accessors
 for my $attr (qw( pid stdin stdout stderr exit signal core options )) {
     no strict 'refs';
@@ -146,7 +158,7 @@ sub is_terminated {
     if ( my $reaped = waitpid( $pid, WNOHANG ) ) {
         my $zed = $reaped == $pid;
         carp "Child process already reaped, check for a SIGCHLD handler"
-            if !$zed;
+            if !$zed && !$QUIET;
 
         @{$self}{ STATUS() } = @{ $self->{reaper} }{ STATUS() }
             = $zed
@@ -354,6 +366,10 @@ and C<signal> attributes. It will instead set all of them to the
 impossible value C<-1>, and display the warning
 C<Child process already reaped, check for a SIGCHLD handler>.
 
+To silence this warning (and accept the impossible status information),
+load C<System::Command> with:
+
+    use System::Command 'quiet';
 
 =head1 AUTHOR
 
