@@ -15,10 +15,10 @@ name: System-Command
 provides:
   System::Command:
     file: lib/System/Command.pm
-    version: 1.01
+    version: 1.02
   System::Command::Reaper:
     file: lib/System/Command/Reaper.pm
-    version: 1.00
+    version: 1.01
 resources:
   license: http://dev.perl.org/licenses/
-version: 1.01
+version: 1.02

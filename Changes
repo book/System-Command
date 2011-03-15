@@ -1,5 +1,17 @@
 Revision history for System-Command
 
+1.02 Tue Mar 15 20:27:29 CET 2011
+        [FEATURES]
+        - new method is_terminated() allows to inquire about the child
+          process state
+        [ENHANCEMENTS]
+        - added a relatively sane behaviour when a SIGCHLD handler exists
+        - warns when such a SIGCHLD handler may prevent prevent the
+          capture of status information at the death of a child process
+        - added a -quiet option to silence the warning
+        - ported fixes from Git::Repository to work with modules that do
+          bad things to STDIN, STDOUT and STDERR (thanks to Todd Rinaldo)
+
 1.01 Tue Feb  1 00:13:33 CET 2011
         [FEATURES]
         - new shortcut class method: spawn()

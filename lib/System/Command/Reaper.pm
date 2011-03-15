@@ -10,7 +10,7 @@ use Scalar::Util qw( weaken );
 use constant HANDLES => qw( stdin stdout stderr );
 use constant STATUS  => qw( exit signal core );
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 sub new {
     my ($class, $command) = @_;
