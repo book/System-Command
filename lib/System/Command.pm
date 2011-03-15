@@ -372,6 +372,10 @@ load C<System::Command> with:
 
     use System::Command -quiet;
 
+It is also possible to more finely control the warning by setting
+the C<$System::Command::QUIET> variable (the warning is not emitted
+if the variable is set to a true value).
+
 =head1 AUTHOR
 
 Philippe Bruhat (BooK), C<< <book at cpan.org> >>
