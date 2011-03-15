@@ -140,14 +140,19 @@ sub is_terminated {
     my $pid = $self->{pid};
 
     # Zed's dead, baby. Zed's dead.
-    return $pid if !kill 0, $pid and defined $self->{exit};
+    return $pid if !kill 0, $pid and exists $self->{exit};
 
     # If that is a re-animated body, we're gonna have to kill it.
     if ( my $reaped = waitpid( $pid, WNOHANG ) ) {
+        my $zed = $reaped == $pid;
+        carp "Child process already reaped, check for a SIGCHLD handler"
+            if !$zed;
+
         @{$self}{ STATUS() } = @{ $self->{reaper} }{ STATUS() }
-            = $reaped == $pid
+            = $zed
             ? ( $? >> 8, $? & 127, $? & 128 )
             : ( -1, -1, -1 );
+
         return $reaped;    # It's dead, Jim!
     }
 
@@ -346,7 +351,9 @@ code (or any module you C<use>) does something like the following:
 
 C<System::Command> will not be able to capture the C<exit>, C<core>
 and C<signal> attributes. It will instead set all of them to the
-impossible value C<-1>.
+impossible value C<-1>, and display the warning
+C<Child process already reaped, check for a SIGCHLD handler>.
+
 
 =head1 AUTHOR
 

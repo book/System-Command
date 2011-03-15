@@ -33,11 +33,14 @@ sub reap {
     $err and $err->opened and $err->close || carp "error closing stderr: $!";
 
     # and wait for the child (if any)
-    if ( my $reaped = waitpid( $self->{pid}, 0 ) ) {
+    if ( my $reaped = waitpid( $self->{pid}, 0 ) and !exists $self->{exit} ) {
+        my $zed = $reaped == $self->{pid};
+        carp "Child process already reaped, check for a SIGCHLD handler"
+            if !$zed;
 
         # check $?
         @{$self}{ STATUS() }
-            = $reaped == $self->{pid}
+            = $zed
             ? ( $? >> 8, $? & 127, $? & 128 )
             : ( -1, -1, -1 );
 
