@@ -32,7 +32,8 @@ sub import {
     my ( $class, @args ) = @_;
     my %arg = ( quiet => sub { $QUIET = 1 } );
     for my $arg (@args) {
-        croak "Unknown parameter '$arg' in 'use System::Command'"
+        $arg =~ s/^-//;    # allow dashed options
+        croak "Unknown option '$arg' in 'use System::Command'"
             if !exists $arg{$arg};
         $arg{$arg}->();
     }
@@ -369,7 +370,7 @@ C<Child process already reaped, check for a SIGCHLD handler>.
 To silence this warning (and accept the impossible status information),
 load C<System::Command> with:
 
-    use System::Command 'quiet';
+    use System::Command -quiet;
 
 =head1 AUTHOR
 
