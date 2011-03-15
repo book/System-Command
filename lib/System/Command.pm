@@ -376,6 +376,16 @@ It is also possible to more finely control the warning by setting
 the C<$System::Command::QUIET> variable (the warning is not emitted
 if the variable is set to a true value).
 
+If the subprocess started by C<System::Command> has a short life
+expectancy, and no other child process is expected to die during that
+time, you could even disable the handler locally (use at your own risks):
+
+    {
+        local $SIG{CHLD};
+        my $cmd = System::Command->new(@cmd);
+        ...
+    }
+
 =head1 AUTHOR
 
 Philippe Bruhat (BooK), C<< <book at cpan.org> >>
