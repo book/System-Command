@@ -10,8 +10,6 @@ use IO::Handle;
 use IPC::Open3 qw( open3 );
 use List::Util qw( reduce );
 
-use System::Command::Reaper;
-
 use POSIX ":sys_wait_h";
 use constant STATUS  => qw( exit signal core );
 
@@ -136,10 +134,6 @@ sub new {
         stderr  => $err,
     }, $class;
 
-    # create the subprocess reaper and link the handles and command to it
-    ${*$in} = ${*$out} = ${*$err} = $self->{reaper}    # typeglobs FTW
-        = System::Command::Reaper->new($self);
-
     return $self;
 }
 
@@ -156,12 +150,19 @@ sub is_terminated {
     return $pid if !kill 0, $pid and exists $self->{exit};
 
     # If that is a re-animated body, we're gonna have to kill it.
-    if ( my $reaped = waitpid( $pid, WNOHANG ) ) {
+    return $self->_reap(WNOHANG);
+}
+
+sub _reap {
+    my ( $self, @flags ) = @_;
+    my $pid = $self->{pid};
+
+    if ( my $reaped = waitpid( $pid, @flags ) and !exists $self->{exit} ) {
         my $zed = $reaped == $pid;
         carp "Child process already reaped, check for a SIGCHLD handler"
             if !$zed && !$QUIET;
 
-        @{$self}{ STATUS() } = @{ $self->{reaper} }{ STATUS() }
+        @{$self}{ STATUS() }
             = $zed
             ? ( $? >> 8, $? & 127, $? & 128 )
             : ( -1, -1, -1 );
@@ -173,8 +174,20 @@ sub is_terminated {
     return;
 }
 
-# delegate close() to the reaper
-sub close { $_[0]{reaper}->reap() }
+sub close {
+    my ($self) = @_;
+
+    # close all pipes
+    my ( $in, $out, $err ) = @{$self}{qw( stdin stdout stderr )};
+    $in  and $in->opened  and $in->close  || carp "error closing stdin: $!";
+    $out and $out->opened and $out->close || carp "error closing stdout: $!";
+    $err and $err->opened and $err->close || carp "error closing stderr: $!";
+
+    # and wait for the child (if any)
+    $self->_reap();
+
+    return $self;
+}
 
 1;
 
@@ -273,7 +286,6 @@ attributes defined (see below).
 
 Close all pipes to the child process, collects exit status, etc.
 and defines a number of attributes (see below).
-
 
 =head2 is_terminated()
 
@@ -397,9 +409,6 @@ C<Git::Repository::Command> during my talk at OSDC.fr 2010, asked
 why it was not an independent module. This module was started by
 taking out of C<Git::Repository::Command> 1.08 the parts that
 weren't related to Git.
-
-The C<System::Command::Reaper> class was added after the addition
-of C<Git::Repository::Command::Reaper> in C<Git::Repository::Command> 1.11.
 
 
 =head1 BUGS
