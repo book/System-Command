@@ -15,6 +15,9 @@ use Config;
 use POSIX ":sys_wait_h";
 use constant STATUS  => qw( exit signal core );
 
+# MSWin32 support
+use constant MSWin32 => $^O eq 'MSWin32';
+
 our $VERSION = '1.09';
 
 our $QUIET = 0;
