@@ -1,5 +1,11 @@
 Revision history for System-Command
 
+1.03 Thu Mar 17 22:47:38 CET 2011
+        [ENHANCEMENTS]
+        - removed all the System::Command::Reaper logic which, while
+          being really nice, didn't actually add any value, and made
+          things more complex
+
 1.02 Tue Mar 15 20:27:29 CET 2011
         [FEATURES]
         - new method is_terminated() allows to inquire about the child

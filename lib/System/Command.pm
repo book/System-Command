@@ -13,7 +13,7 @@ use List::Util qw( reduce );
 use POSIX ":sys_wait_h";
 use constant STATUS  => qw( exit signal core );
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 # Trap the real STDIN/ERR/OUT file handles in case someone
 # *COUGH* Catalyst *COUGH* screws with them which breaks open3
