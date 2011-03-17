@@ -17,6 +17,7 @@ use constant STATUS  => qw( exit signal core );
 
 # MSWin32 support
 use constant MSWin32 => $^O eq 'MSWin32';
+require IPC::Run if MSWin32;
 
 our $VERSION = '1.09';
 
@@ -48,13 +49,24 @@ my $_seq   = 0;
 my $_spawn = sub {
     my (@cmd) = @_;
     my $pid;
+
     # setup filehandles
     my $in  = Symbol::gensym;
     my $out = Symbol::gensym;
     my $err = Symbol::gensym;
 
     # start the command
-    $pid = open3( $in, $out, $err, @cmd );
+    if (MSWin32) {
+        $pid = IPC::Run::start(
+            [@cmd],
+            '<pipe'  => $in,
+            '>pipe'  => $out,
+            '2>pipe' => $err,
+        );
+    }
+    else {
+        $pid = eval { open3( $in, $out, $err, @cmd ); };
+    }
 
     return ( $pid, $in, $out, $err );
 };
@@ -116,12 +128,13 @@ sub new {
 
     # create the object
     my $self = bless {
-        cmdline => [ @cmd ],
-        options => $o,
-        pid     => $pid,
-        stdin   => $in,
-        stdout  => $out,
-        stderr  => $err,
+        cmdline  => [@cmd],
+        options  => $o,
+        pid      => MSWin32 ? $pid->{KIDS}[0]{PID} : $pid,
+        stdin    => $in,
+        stdout   => $out,
+        stderr   => $err,
+        _ipc_run => $pid,
     }, $class;
 
     return $self;
