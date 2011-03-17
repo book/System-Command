@@ -1,7 +1,6 @@
 Build.PL
 Changes
 lib/System/Command.pm
-lib/System/Command/Reaper.pm
 Makefile.PL
 MANIFEST			This list of files
 README
