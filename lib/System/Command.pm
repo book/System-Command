@@ -9,6 +9,7 @@ use Cwd qw( cwd );
 use IO::Handle;
 use IPC::Open3 qw( open3 );
 use Symbol ();
+use Scalar::Util qw( blessed );
 use List::Util qw( reduce );
 
 use Config;
@@ -117,6 +118,20 @@ sub new {
     # FIXME - better check error conditions
     croak $@ if !defined $pid;
 
+    # trace: should collapse into a coderef (or nothing)
+    my $logger;
+    if ( my $trace = $o->{trace} ) {
+        $logger
+            = ref $trace eq 'GLOB' ? sub { print {$trace} shift, "\n" }
+            : blessed $trace && $trace->can('print')
+                                   ? sub { $trace->print( shift() . "\n" ) }
+            : ref $trace eq 'CODE' ? $trace
+            :                        sub { print STDERR shift, "\n" };
+        $logger->( "System::Command: $pid - @cmd" );
+        $logger->( "System::Command: $pid - \$ENV{$_} = $o->{env}{$_}" )
+            for keys %{$o->{env}};
+    }
+
     # some input was provided
     if ( defined $o->{input} ) {
         local $SIG{PIPE}
@@ -140,6 +155,7 @@ sub new {
         stdout   => $out,
         stderr   => $err,
         _ipc_run => $pid,
+        trace   => $logger,
     }, $class;
 
     return $self;
@@ -174,6 +190,11 @@ sub _reap {
             = $zed
             ? ( $? >> 8, $? & 127, $? & 128 )
             : ( -1, -1, -1 );
+
+        $self->{trace} && $self->{trace}->(
+            sprintf "System::Command: %d - exit: %d, signal: %d, core: %d",
+            @{$self}{ pid => STATUS() }
+        );
 
         return $reaped;    # It's dead, Jim!
     }
