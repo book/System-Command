@@ -102,8 +102,10 @@ sub new {
     local %ENV = %ENV;
 
     # update the environment
-    @ENV{ keys %{ $o->{env} } } = values %{ $o->{env} }
-        if exists $o->{env};
+    if ( exists $o->{env} ) {
+        @ENV{ keys %{ $o->{env} } } = values %{ $o->{env} };
+        delete $ENV{$_} for grep { !defined $ENV{$_} } keys %{ $o->{env} };
+    }
 
     # start the command
     my ( $pid, $in, $out, $err ) = eval { $_spawn->(@cmd); };
@@ -257,6 +259,9 @@ The I<current working directory> in which the command will be run.
 =item C<env>
 
 A hashref containing key / values to add to the command environment.
+
+If a value is C<undef>, the variable corresponding to the key will
+be I<removed> from the environment.
 
 =item C<input>
 
