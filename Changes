@@ -1,5 +1,13 @@
 Revision history for System-Command
 
+1.04 Tue Jun  7 00:47:13 CEST 2011
+        [ENHANCEMENTS]
+        - allow removing variables from the environment by setting
+          keys with an 'undef' value in the 'env' option
+        [TESTS]
+        - tests for the import options
+        - added tests that were created for version 1.02 to the MANIFEST
+
 1.03 Thu Mar 17 22:47:38 CET 2011
         [ENHANCEMENTS]
         - removed all the System::Command::Reaper logic which, while
