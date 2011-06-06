@@ -6,6 +6,7 @@ use File::Temp qw( tempdir );
 use Cwd qw( cwd abs_path );
 use System::Command;
 
+$ENV{TO_BE_DELETED} = 'LATER';
 my $dir   = abs_path( tempdir( CLEANUP => 1 ) );
 my $cwd   = cwd;
 my $name  = File::Spec->catfile( t => 'info.pl' );
@@ -44,12 +45,14 @@ my @tests = (
     {   cmdline => [
             $^X, $name,
             { env => { SYSTEM_COMMAND => 'System::Command' } },
+            { env => { TO_BE_DELETED  => undef } },
             { env => { OTHER_ENV      => 'something else' } },
         ],
         options => {
             env => {
                 OTHER_ENV      => 'something else',
                 SYSTEM_COMMAND => 'System::Command',
+                TO_BE_DELETED  => undef,
             }
         },
     },
@@ -63,9 +66,15 @@ my @tests = (
     },
     {   cmdline => [
             $^X, $name,
-            { env => { 'SYSTEM_COMMAND_INPUT' => 1 }, input => '' }
+            {   env =>
+                    { 'SYSTEM_COMMAND_INPUT' => 1, 'TO_BE_DELETED' => undef },
+                input => ''
+            }
         ],
-        options => { env => { 'SYSTEM_COMMAND_INPUT' => 1 }, input => '' }
+        options => {
+            env => { 'SYSTEM_COMMAND_INPUT' => 1, 'TO_BE_DELETED' => undef },
+            input => ''
+            }
     },
 );
 my @fail = (
@@ -113,13 +122,17 @@ for my $t ( @tests, @fail ) {
     my $errput = join '', $cmd->stderr->getlines();
     is( $errput, '', 'no errput' );
 
+    my $env = { %ENV, %{ $t->{options}{env} || {} } };
+    delete $env->{$_}
+        for grep { !defined $t->{options}{env}{$_} }
+        keys %{ $t->{options}{env} || {} };
     my $info;
     eval $output;
     is_deeply(
         $info,
         {   argv => [],
             cwd  => $t->{options}{cwd} || $cwd,
-            env  => { %ENV, %{ $t->{options}{env} || {} } },
+            env  => $env,
             input => $t->{options}{input} || '',
             name  => $t->{name}           || $name,
             pid   => $cmd->pid,
