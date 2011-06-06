@@ -104,7 +104,8 @@ sub new {
     # update the environment
     if ( exists $o->{env} ) {
         @ENV{ keys %{ $o->{env} } } = values %{ $o->{env} };
-        delete $ENV{$_} for grep { !defined $ENV{$_} } keys %{ $o->{env} };
+        delete $ENV{$_}
+            for grep { !defined $o->{env}{$_} } keys %{ $o->{env} };
     }
 
     # start the command
