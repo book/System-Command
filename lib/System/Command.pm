@@ -142,7 +142,7 @@ sub new {
 
 sub spawn {
     my ( $class, @cmd ) = @_;
-    return @{ System::Command->new(@cmd) }{qw( pid stdin stdout stderr )};
+    return @{ $class->new(@cmd) }{qw( pid stdin stdout stderr )};
 }
 
 sub is_terminated {
