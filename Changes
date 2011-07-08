@@ -1,5 +1,9 @@
 Revision history for System-Command
 
+1.05 Fri Jul  8 09:16:25 CEST 2011
+        [ENHANCEMENTS]
+        - make spawn() work properly with subclasses
+
 1.04 Tue Jun  7 00:47:13 CEST 2011
         [ENHANCEMENTS]
         - allow removing variables from the environment by setting
