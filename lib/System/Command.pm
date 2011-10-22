@@ -281,7 +281,7 @@ an exception.
 =back
 
 If several option hashes are passed to C<new()>, they will be merged
-together with individual values being overriden by those (with the same
+together with individual values being overridden by those (with the same
 key) from hashes that appear later in the list.
 
 The C<System::Command> object returned by C<new()> has a number of
