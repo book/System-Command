@@ -15,15 +15,6 @@ use constant STATUS  => qw( exit signal core );
 
 our $VERSION = '1.05';
 
-# Trap the real STDIN/ERR/OUT file handles in case someone
-# *COUGH* Catalyst *COUGH* screws with them which breaks open3
-my ($REAL_STDIN, $REAL_STDOUT, $REAL_STDERR);
-BEGIN {
-    open $REAL_STDIN, "<&=".fileno(*STDIN);
-    open $REAL_STDOUT, ">>&=".fileno(*STDOUT);
-    open $REAL_STDERR, ">>&=".fileno(*STDERR);
-}
-
 our $QUIET = 0;
 
 sub import {
@@ -52,11 +43,6 @@ my $_seq   = 0;
 my $_spawn = sub {
     my (@cmd) = @_;
     my ( $pid, $in, $out, $err );
-
-    # save standard handles
-    local *STDIN  = $REAL_STDIN;
-    local *STDOUT = $REAL_STDOUT;
-    local *STDERR = $REAL_STDERR;
 
     # setup filehandles
     {
