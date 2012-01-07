@@ -9,6 +9,8 @@ t/01-load.t
 t/10-command.t
 t/15-scope.t
 t/20-zombie.t
+t/90-command.t
+t/90-output.t
 t/fail.pl
 t/info.pl
 t/lines.pl
@@ -16,3 +18,4 @@ t/manifest.t
 t/pod-coverage.t
 t/pod.t
 META.yml
+META.json
