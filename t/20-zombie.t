@@ -3,6 +3,7 @@ use warnings;
 use Test::More;
 use System::Command;
 use File::Spec;
+use Time::HiRes qw( time );
 
 my @cmd = ( $^X, File::Spec->catfile( t => 'fail.pl' ) );
 
@@ -79,6 +80,16 @@ is( $cmd->exit, undef, 'no exit status' );
 
 # don't leave it time, just choke it now
 $cmd->close;
+
+# See http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=666631#17
+# Under load, there can be a window of time during which the child
+# process is still reachable via kill(0), even though waitpid() returned
+my ( $start, $pid, $attempts ) = ( time, $cmd->pid, 0 );
+$attempts++ while kill 0, $pid;
+diag sprintf '%d kill( 0, $pid ) attempts succeeded in %f seconds', $attempts,
+    time - $start
+    if $attempts;
+
 ok( $cmd->is_terminated, 'child was reaped' );    # was dead and gone
 is( $cmd->exit, -1, 'BOGUS exit status collected' );
 ok( !$cmd->stdout->opened, 'stdout closed' );
