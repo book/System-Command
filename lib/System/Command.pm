@@ -13,7 +13,7 @@ use List::Util qw( reduce );
 use POSIX ":sys_wait_h";
 use constant STATUS  => qw( exit signal core );
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 our $QUIET = 0;
 

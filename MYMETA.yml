@@ -16,7 +16,7 @@ name: System-Command
 provides:
   System::Command:
     file: lib/System/Command.pm
-    version: 1.06
+    version: 1.07
 resources:
   license: http://dev.perl.org/licenses/
-version: 1.06
+version: 1.07
