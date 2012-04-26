@@ -3,7 +3,12 @@ use warnings;
 use Test::More;
 use System::Command;
 use File::Spec;
-use Scalar::Util 'refaddr';
+
+BEGIN {
+    eval 'use Scalar::Util qw( refaddr ); 1;'
+        or plan skip_all =>
+        "Scalar::Util $Scalar::Util::VERSION does not provide refaddr";
+}
 
 plan tests => my $tests;
 
