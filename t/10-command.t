@@ -5,6 +5,7 @@ use File::Spec;
 use File::Temp qw( tempdir );
 use Cwd qw( cwd abs_path );
 use System::Command;
+use Config;
 
 $ENV{TO_BE_DELETED} = 'LATER';
 my $dir   = abs_path( tempdir( CLEANUP => 1 ) );
@@ -87,6 +88,11 @@ my @fail = (
 );
 
 plan tests => 14 * @tests + 2 * @fail;
+
+if ( $Config{sig_name} !~ /\bPIPE\b/ ) {
+   diag "No SIGPIPE signal on this Perl. Available signals:";
+   diag $Config{sig_name};
+}
 
 for my $t ( @tests, @fail ) {
 
