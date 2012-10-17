@@ -10,6 +10,7 @@ use IO::Handle;
 use IPC::Open3 qw( open3 );
 use List::Util qw( reduce );
 
+use Config;
 use POSIX ":sys_wait_h";
 use constant STATUS  => qw( exit signal core );
 
@@ -103,7 +104,8 @@ sub new {
     # some input was provided
     if ( defined $o->{input} ) {
         local $SIG{PIPE}
-            = sub { croak "Broken pipe when writing to: @cmd" };
+            = sub { croak "Broken pipe when writing to: @cmd" }
+            if $Config{sig_name} =~ /\bPIPE\b/;
         print {$in} $o->{input} if length $o->{input};
         $in->close;
     }
