@@ -237,6 +237,13 @@ Runs an external command using the list in C<@cmd>.
 
 If C<@cmd> contains a hash reference, it is taken as an I<option> hash.
 
+If several option hashes are passed to C<new()>, they will be merged
+together with individual values being overridden by those (with the same
+key) from hashes that appear later in the list.
+
+To allow subclasses to support their own set of options, unrecognized
+options are silently ignored.
+
 The recognized keys are:
 
 =over 4
@@ -267,10 +274,6 @@ which will cause a SIGPIPE when trying to write to it. This will raise
 an exception.
 
 =back
-
-If several option hashes are passed to C<new()>, they will be merged
-together with individual values being overridden by those (with the same
-key) from hashes that appear later in the list.
 
 The C<System::Command> object returned by C<new()> has a number of
 attributes defined (see below).
