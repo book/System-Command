@@ -18,6 +18,7 @@ my $builder = Module::Build->new(
         'List::Util' => 0,
         'Config'     => 0,
         'POSIX'      => 0,
+        'Symbol'     => 0,
     },
     add_to_cleanup      => [ 'System-Command-*' ],
     meta_merge     => {

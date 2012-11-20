@@ -20,6 +20,7 @@ WriteMakefile(
         'List::Util' => 0,
         'Config'     => 0,
         'POSIX'      => 0,
+        'Symbol'     => 0,
     },
     META_MERGE => {
         resources => {
