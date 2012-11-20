@@ -13,6 +13,8 @@ WriteMakefile(
     PL_FILES            => {},
     PREREQ_PM => {
         'Test::More' => 0,
+	'Symbol'     => 0,
+	# TODO Specify all dependencies	even for core modules
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'System-Command-*' },
