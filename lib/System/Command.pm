@@ -14,7 +14,7 @@ use Config;
 use POSIX ":sys_wait_h";
 use constant STATUS  => qw( exit signal core );
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 our $QUIET = 0;
 
