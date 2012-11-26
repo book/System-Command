@@ -13,6 +13,13 @@ WriteMakefile(
     PL_FILES            => {},
     PREREQ_PM => {
         'Test::More' => 0,
+        'IPC::Open3' => 0,
+        'Carp'       => 0,
+        'Cwd'        => 0,
+        'IO::Handle' => 0,
+        'List::Util' => 0,
+        'Config'     => 0,
+        'POSIX'      => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'System-Command-*' },

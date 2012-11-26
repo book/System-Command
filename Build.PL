@@ -10,6 +10,15 @@ my $builder = Module::Build->new(
     build_requires => {
         'Test::More' => 0,
     },
+    requires         => {
+        'IPC::Open3' => 0,
+        'Carp'       => 0,
+        'Cwd'        => 0,
+        'IO::Handle' => 0,
+        'List::Util' => 0,
+        'Config'     => 0,
+        'POSIX'      => 0,
+    },
     add_to_cleanup      => [ 'System-Command-*' ],
 );
 
