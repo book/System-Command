@@ -20,6 +20,11 @@ my $builder = Module::Build->new(
         'POSIX'      => 0,
     },
     add_to_cleanup      => [ 'System-Command-*' ],
+    meta_merge     => {
+        resources => {
+            repository => 'http://github.com/book/System-Command',
+        },
+    },
 );
 
 $builder->create_build_script();

@@ -21,6 +21,11 @@ WriteMakefile(
         'Config'     => 0,
         'POSIX'      => 0,
     },
+    META_MERGE => {
+        resources => {
+            repository => 'http://github.com/book/System-Command',
+        },
+    },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'System-Command-*' },
 );
