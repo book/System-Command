@@ -9,6 +9,8 @@ my $builder = Module::Build->new(
     dist_version_from   => 'lib/System/Command.pm',
     build_requires => {
         'Test::More' => 0,
+        'Symbol'     => 0,
+        # TODO Specify all dependencies, even for core modules
     },
     add_to_cleanup      => [ 'System-Command-*' ],
 );
