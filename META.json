@@ -23,19 +23,34 @@
          "requires" : {
             "Module::Build" : "0.38"
          }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Config" : 0,
+            "Cwd" : 0,
+            "IO::Handle" : 0,
+            "IPC::Open3" : 0,
+            "List::Util" : 0,
+            "POSIX" : 0,
+            "Symbol" : 0
+         }
       }
    },
    "provides" : {
       "System::Command" : {
          "file" : "lib/System/Command.pm",
-         "version" : "1.08"
+         "version" : "1.09"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "url" : "http://github.com/book/System-Command"
+      }
    },
-   "version" : "1.08"
+   "version" : "1.09"
 }

@@ -16,7 +16,17 @@ name: System-Command
 provides:
   System::Command:
     file: lib/System/Command.pm
-    version: 1.08
+    version: 1.09
+requires:
+  Carp: 0
+  Config: 0
+  Cwd: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  List::Util: 0
+  POSIX: 0
+  Symbol: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 1.08
+  repository: http://github.com/book/System-Command
+version: 1.09

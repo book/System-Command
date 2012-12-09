@@ -1,5 +1,11 @@
 Revision history for System-Command
 
+1.09 Sun Dec  9 2012
+        [ENHANCEMENTS]
+        - list all dependencies and the github public repo in the META files
+          (RT #81302)
+        - use Symbol::gensym to create anonumous GLOBs (github #4)
+
 1.08 Mon Nov 26 2012
         [ENHANCEMENTS]
         - remove a superfluous eval {} that was hiding open3 exception
