@@ -41,7 +41,6 @@ for my $attr (qw( cmdline )) {
 }
 
 # a private sub-process spawning function
-my $_seq   = 0;
 my $_spawn = sub {
     my (@cmd) = @_;
     my $pid;
