@@ -1,5 +1,14 @@
 Revision history for System-Command
 
+1.100 Sun Apr 14 2013
+        [ENHANCEMENTS]
+        - use a IPC::Run-based implementation on Win32
+        - thanks to a lot of testing help from Christian Walde (MITHALDU)
+          the test suite passes on Win32
+        - while working on this, we established that kill 0, $pid is broken
+          under Win32 (reported to the perl5-porters mailing-list via
+          <op.wvi2ygw1ydyjqt@digitizedsqueak.lancs.ac.uk>)
+
 1.09 Sun Dec  9 2012
         [ENHANCEMENTS]
         - list all dependencies and the github public repo in the META files
