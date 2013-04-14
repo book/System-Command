@@ -12,6 +12,11 @@ plan tests => 28;
 my $status = 1;
 my $delay  = 2;
 
+# this is necessary, because kill(0,pid) is misimplemented in perl core
+my $_is_alive = $^O eq 'MSWin32'
+    ? sub { return `tasklist /FO CSV /NH /fi "PID eq $_[0]"` =~ /^"/ }
+    : sub { return kill 0, $_[0]; };
+
 # catch warnings
 my $expect_CHLD_warning;
 $SIG{__WARN__} = sub {
@@ -85,7 +90,7 @@ $cmd->close;
 # Under load, there can be a window of time during which the child
 # process is still reachable via kill(0), even though waitpid() returned
 my ( $start, $pid, $attempts ) = ( time, $cmd->pid, 0 );
-$attempts++ while System::Command::process_lives($pid);
+$attempts++ while $_is_alive->($pid);
 diag sprintf '%d kill( 0, $pid ) attempts succeeded in %f seconds', $attempts,
     time - $start
     if $attempts;

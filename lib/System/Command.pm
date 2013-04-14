@@ -44,7 +44,8 @@ for my $attr (qw( cmdline )) {
     *$attr = sub { return @{ $_[0]{$attr} } };
 }
 
-# a private sub-process spawning function
+# REALLY PRIVATE FUNCTIONS
+# a sub-process spawning function
 my $_seq   = 0;
 my $_spawn = sub {
     my (@cmd) = @_;
@@ -70,6 +71,11 @@ my $_spawn = sub {
 
     return ( $pid, $in, $out, $err );
 };
+
+# this is necessary, because kill(0,pid) is misimplemented in perl core
+my $_is_alive = MSWin32
+    ? sub { return `tasklist /FO CSV /NH /fi "PID eq $_[0]"` =~ /^"/ }
+    : sub { return kill 0, $_[0]; };
 
 # module methods
 sub new {
@@ -150,7 +156,7 @@ sub is_terminated {
     my $pid = $self->{pid};
 
     # Zed's dead, baby. Zed's dead.
-    return $pid if !process_lives( $pid ) and exists $self->{exit};
+    return $pid if !$_is_alive->($pid) and exists $self->{exit};
 
     # If that is a re-animated body, we're gonna have to kill it.
     return $self->_reap(WNOHANG);
@@ -190,13 +196,6 @@ sub close {
     $self->_reap();
 
     return $self;
-}
-
-# this is necessary, because kill(0,pid) is misimplemented in perl core
-sub process_lives {
-    my ( $pid ) = @_;
-    return ( `tasklist /FO CSV /NH /fi "PID eq $pid"` =~ /^"/ ) if $^O eq 'MSWin32';
-    return !kill 0, $pid;
 }
 
 1;
