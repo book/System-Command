@@ -21,6 +21,7 @@ WriteMakefile(
         'Config'     => 0,
         'POSIX'      => 0,
         'Symbol'     => 0,
+        ( 'IPC::Run' => 0 )x!! ( $^O eq 'MSWin32' ),
     },
     META_MERGE => {
         resources => {

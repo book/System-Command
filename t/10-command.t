@@ -6,6 +6,7 @@ use File::Temp qw( tempdir );
 use Cwd qw( cwd abs_path );
 use System::Command;
 use Config;
+use constant MSWin32 => $^O eq 'MSWin32';
 
 $ENV{TO_BE_DELETED} = 'LATER';
 my $dir   = abs_path( tempdir( CLEANUP => 1 ) );
@@ -134,13 +135,16 @@ for my $t ( @tests, @fail ) {
         keys %{ $t->{options}{env} || {} };
     my $info;
     eval $output;
+    my $w32env = {};
+    $w32env = { PWD => $t->{options}{cwd} }
+        if MSWin32 && exists $t->{options}{cwd};
     is_deeply(
         $info,
-        {   argv => [],
-            cwd  => $t->{options}{cwd} || $cwd,
-            env  => $env,
+        {   argv  => [],
+            cwd   => $t->{options}{cwd} || $cwd,
+            env   => { %$env, %$w32env },
             input => $t->{options}{input} || '',
-            name  => $t->{name}           || $name,
+            name  => $t->{name} || $name,
             pid   => $cmd->pid,
         },
         "perl $name"

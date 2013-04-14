@@ -19,6 +19,7 @@ my $builder = Module::Build->new(
         'Config'     => 0,
         'POSIX'      => 0,
         'Symbol'     => 0,
+        ( 'IPC::Run' => 0 )x!! ( $^O eq 'MSWin32' ),
     },
     add_to_cleanup      => [ 'System-Command-*' ],
     meta_merge     => {

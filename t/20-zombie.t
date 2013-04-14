@@ -7,10 +7,19 @@ use Time::HiRes qw( time );
 
 my @cmd = ( $^X, File::Spec->catfile( t => 'fail.pl' ) );
 
-plan tests => 28;
+my $win32 = $^O eq 'MSWin32';
+
+# under Win32, $SIG{CHLD} = 'IGNORE' has no effect,
+# and we do not get the expected warnings
+plan tests => 28 + ( $win32 ? -2 : 0 );
 
 my $status = 1;
 my $delay  = 2;
+
+# this is necessary, because kill(0,pid) is misimplemented in perl core
+my $_is_alive = $win32
+    ? sub { return `tasklist /FO CSV /NH /fi "PID eq $_[0]"` =~ /^"/ }
+    : sub { return kill 0, $_[0]; };
 
 # catch warnings
 my $expect_CHLD_warning;
@@ -60,7 +69,9 @@ is( $cmd->exit, undef, 'no exit status' );
 # leave it time to die
 sleep $delay + 1;
 ok( $cmd->is_terminated, 'child was reaped' );    # was dead and gone
-is( $cmd->exit, -1, 'BOGUS exit status collected' );
+$win32
+    ? is( $cmd->exit, $status, 'exit status collected' )
+    : is( $cmd->exit, -1,      'BOGUS exit status collected' );
 
 # yes, our handles are still open
 ok( $cmd->is_terminated,  'child is still dead' );
@@ -85,13 +96,15 @@ $cmd->close;
 # Under load, there can be a window of time during which the child
 # process is still reachable via kill(0), even though waitpid() returned
 my ( $start, $pid, $attempts ) = ( time, $cmd->pid, 0 );
-$attempts++ while kill 0, $pid;
+$attempts++ while $_is_alive->($pid);
 diag sprintf '%d kill( 0, $pid ) attempts succeeded in %f seconds', $attempts,
     time - $start
     if $attempts;
 
 ok( $cmd->is_terminated, 'child was reaped' );    # was dead and gone
-is( $cmd->exit, -1, 'BOGUS exit status collected' );
+$win32
+    ? is( $cmd->exit, $status, 'exit status collected' )
+    : is( $cmd->exit, -1,      'BOGUS exit status collected' );
 ok( !$cmd->stdout->opened, 'stdout closed' );
 ok( !$cmd->stderr->opened, 'stderr closed' );
 
