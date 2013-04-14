@@ -85,7 +85,7 @@ $cmd->close;
 # Under load, there can be a window of time during which the child
 # process is still reachable via kill(0), even though waitpid() returned
 my ( $start, $pid, $attempts ) = ( time, $cmd->pid, 0 );
-$attempts++ while kill 0, $pid;
+$attempts++ while System::Command::process_lives($pid);
 diag sprintf '%d kill( 0, $pid ) attempts succeeded in %f seconds', $attempts,
     time - $start
     if $attempts;
