@@ -418,7 +418,7 @@ Philippe Bruhat (BooK), C<< <book at cpan.org> >>
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Alexis Sukrieh who, when he saw the description of
+Thanks to Alexis Sukrieh (SUKRIA) who, when he saw the description of
 C<Git::Repository::Command> during my talk at OSDC.fr 2010, asked
 why it was not an independent module. This module was started by
 taking out of C<Git::Repository::Command> 1.08 the parts that
@@ -465,7 +465,7 @@ L<http://search.cpan.org/dist/System-Command/>
 
 =head1 COPYRIGHT
 
-Copyright 2010-2011 Philippe Bruhat (BooK).
+Copyright 2010-2013 Philippe Bruhat (BooK).
 
 =head1 LICENSE
 
@@ -473,8 +473,7 @@ This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
-See http://dev.perl.org/licenses/ for more information.
-
+See L<http://dev.perl.org/licenses/> for more information.
 
 =cut
 
