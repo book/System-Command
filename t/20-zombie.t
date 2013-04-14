@@ -13,7 +13,8 @@ my $status = 1;
 my $delay  = 2;
 
 # this is necessary, because kill(0,pid) is misimplemented in perl core
-my $_is_alive = $^O eq 'MSWin32'
+my $win32 = $^O eq 'MSWin32';
+my $_is_alive = $win32
     ? sub { return `tasklist /FO CSV /NH /fi "PID eq $_[0]"` =~ /^"/ }
     : sub { return kill 0, $_[0]; };
 
@@ -65,7 +66,9 @@ is( $cmd->exit, undef, 'no exit status' );
 # leave it time to die
 sleep $delay + 1;
 ok( $cmd->is_terminated, 'child was reaped' );    # was dead and gone
-is( $cmd->exit, -1, 'BOGUS exit status collected' );
+$win32
+    ? is( $cmd->exit, $status, 'exit status collected' )
+    : is( $cmd->exit, -1,      'BOGUS exit status collected' );
 
 # yes, our handles are still open
 ok( $cmd->is_terminated,  'child is still dead' );
@@ -96,7 +99,9 @@ diag sprintf '%d kill( 0, $pid ) attempts succeeded in %f seconds', $attempts,
     if $attempts;
 
 ok( $cmd->is_terminated, 'child was reaped' );    # was dead and gone
-is( $cmd->exit, -1, 'BOGUS exit status collected' );
+$win32
+    ? is( $cmd->exit, $status, 'exit status collected' )
+    : is( $cmd->exit, -1,      'BOGUS exit status collected' );
 ok( !$cmd->stdout->opened, 'stdout closed' );
 ok( !$cmd->stderr->opened, 'stderr closed' );
 
