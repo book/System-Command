@@ -7,13 +7,16 @@ use Time::HiRes qw( time );
 
 my @cmd = ( $^X, File::Spec->catfile( t => 'fail.pl' ) );
 
-plan tests => 28;
+my $win32 = $^O eq 'MSWin32';
+
+# under Win32, $SIG{CHLD} = 'IGNORE' has no effect,
+# and we do not get the expected warnings
+plan tests => 28 + ( $win32 ? -2 : 0 );
 
 my $status = 1;
 my $delay  = 2;
 
 # this is necessary, because kill(0,pid) is misimplemented in perl core
-my $win32 = $^O eq 'MSWin32';
 my $_is_alive = $win32
     ? sub { return `tasklist /FO CSV /NH /fi "PID eq $_[0]"` =~ /^"/ }
     : sub { return kill 0, $_[0]; };
