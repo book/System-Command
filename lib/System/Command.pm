@@ -424,6 +424,8 @@ why it was not an independent module. This module was started by
 taking out of C<Git::Repository::Command> 1.08 the parts that
 weren't related to Git.
 
+Thanks to Christian Walde (MITHALDU) for his help in making this
+module work better under Win32.
 
 =head1 BUGS
 
