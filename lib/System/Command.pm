@@ -150,7 +150,7 @@ sub is_terminated {
     my $pid = $self->{pid};
 
     # Zed's dead, baby. Zed's dead.
-    return $pid if !kill 0, $pid and exists $self->{exit};
+    return $pid if !process_lives( $pid ) and exists $self->{exit};
 
     # If that is a re-animated body, we're gonna have to kill it.
     return $self->_reap(WNOHANG);
@@ -190,6 +190,13 @@ sub close {
     $self->_reap();
 
     return $self;
+}
+
+# this is necessary, because kill(0,pid) is misimplemented in perl core
+sub process_lives {
+    my ( $pid ) = @_;
+    return ( `tasklist /FO CSV /NH /fi "PID eq $pid"` =~ /^"/ ) if $^O eq 'MSWin32';
+    return !kill 0, $pid;
 }
 
 1;
