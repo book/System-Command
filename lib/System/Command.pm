@@ -128,6 +128,8 @@ sub new {
             : ref $trace eq 'CODE' ? $trace
             :                        sub { print STDERR shift, "\n" };
         $logger->( "System::Command: $pid - @cmd" );
+        $logger->( "System::Command: $pid - $_ = $o->{$_}" )
+            for grep { $_ ne 'env' } sort keys %$o;
         $logger->( "System::Command: $pid - \$ENV{$_} = $o->{env}{$_}" )
             for keys %{$o->{env}};
     }
