@@ -139,7 +139,7 @@ sub new {
         stdin    => $in,
         stdout   => $out,
         stderr   => $err,
-        _ipc_run => $pid,
+      ( _ipc_run => $pid )x!! MSWin32,
     }, $class;
 
     return $self;
