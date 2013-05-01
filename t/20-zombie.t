@@ -8,10 +8,11 @@ use Time::HiRes qw( time );
 my @cmd = ( $^X, File::Spec->catfile( t => 'fail.pl' ) );
 
 my $win32 = $^O eq 'MSWin32';
+my $cygwin = $^O eq 'cygwin';
 
 # under Win32, $SIG{CHLD} = 'IGNORE' has no effect,
 # and we do not get the expected warnings
-plan tests => 28 + ( $win32 ? -2 : 0 );
+plan tests => 28 + ( $win32 ? -2 : 0 ) + ($cygwin ? -1 : 0);
 
 my $status = 1;
 my $delay  = 2;
@@ -102,7 +103,7 @@ diag sprintf '%d kill( 0, $pid ) attempts succeeded in %f seconds', $attempts,
     if $attempts;
 
 ok( $cmd->is_terminated, 'child was reaped' );    # was dead and gone
-$win32
+($win32 or $cygwin)
     ? is( $cmd->exit, $status, 'exit status collected' )
     : is( $cmd->exit, -1,      'BOGUS exit status collected' );
 ok( !$cmd->stdout->opened, 'stdout closed' );
