@@ -4,8 +4,8 @@ use Test::More;
 use System::Command;
 use File::Spec;
 
+# show more precise times if possible
 eval "use Time::HiRes qw( time )";
-plan skip_all => "Time::HiRes required for testing" if $@;
 
 my @cmd = ( $^X, File::Spec->catfile( t => 'fail.pl' ) );
 
