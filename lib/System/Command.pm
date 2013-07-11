@@ -19,7 +19,7 @@ use constant STATUS  => qw( exit signal core );
 use constant MSWin32 => $^O eq 'MSWin32';
 require IPC::Run if MSWin32;
 
-our $VERSION = '1.100';
+our $VERSION = '1.101';
 
 our $QUIET = 0;
 

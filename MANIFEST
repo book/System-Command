@@ -15,7 +15,7 @@ t/fail.pl
 t/info.pl
 t/lines.pl
 t/manifest.t
-t/pod-coverage.t
-t/pod.t
+xt/pod-coverage.t
+xt/pod.t
 META.yml
 META.json

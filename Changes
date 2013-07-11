@@ -1,5 +1,11 @@
 Revision history for System-Command
 
+1.101 Thu Jul 11 2013
+        [TESTS]
+        - various minor test improvements (thanks to Oleg Gashev and mokko)
+        [DOCUMENTATION]
+        - minor documentation improvements
+
 1.100 Sun Apr 14 2013
         [ENHANCEMENTS]
         - use a IPC::Run-based implementation on Win32
