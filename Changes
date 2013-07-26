@@ -1,5 +1,12 @@
 Revision history for System-Command
 
+1.102 Fri Jul 26 2013
+        [ENHANCEMENTS]
+        - ported an older fix from Git::Repository, to make System::Command
+          work with modules that do bad things to STDIN, STDOUT and STDERR
+          (thanks to Todd Rinaldo for his 2010 patch to Git::Repository)
+          [work done during the patch -p0 hackathon]
+
 1.101 Thu Jul 11 2013
         [TESTS]
         - various minor test improvements (thanks to Oleg Gashev and mokko)

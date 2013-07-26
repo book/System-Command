@@ -28,7 +28,7 @@ BEGIN {
 use constant MSWin32 => $^O eq 'MSWin32';
 require IPC::Run if MSWin32;
 
-our $VERSION = '1.101';
+our $VERSION = '1.102';
 
 our $QUIET = 0;
 
