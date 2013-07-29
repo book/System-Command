@@ -3,8 +3,11 @@ use strict;
 use Test::More;
 
 BEGIN {
-    plan skip_all => 'Test::Output not available'
-        if ! eval 'use Test::Output; 1;';
+    if ( !eval 'use Test::Output; 1;' ) {
+        $ENV{RELEASE_TESTING}
+            ? die "Test::Output is required for RELEASE_TESTING"
+            : plan skip_all => 'Test::Output not available';
+    }
 }
 
 use System::Command;
