@@ -1,5 +1,12 @@
 Revision history for System-Command
 
+1.103 Mon Jul 29 2013
+        [ENHANCEMENTS]
+        - rewrote the _spawn code to work properly under Plack
+        - version 1.100 and 1.102 re-introduced old bugs: they
+          have been squished again, and tests fixed to prevent
+          re-re-introduction
+
 1.102 Fri Jul 26 2013
         [ENHANCEMENTS]
         - ported an older fix from Git::Repository, to make System::Command
