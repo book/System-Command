@@ -15,15 +15,6 @@ use Config;
 use POSIX ":sys_wait_h";
 use constant STATUS  => qw( exit signal core );
 
-# Trap the real STDIN/ERR/OUT file handles
-# in case someone screws with them which breaks open3
-my ( $REAL_STDIN, $REAL_STDOUT, $REAL_STDERR );
-BEGIN {
-    open $REAL_STDIN,  '<&='  . fileno(*STDIN);
-    open $REAL_STDOUT, '>>&=' . fileno(*STDOUT);
-    open $REAL_STDERR, '>>&=' . fileno(*STDERR);
-}
-
 # MSWin32 support
 use constant MSWin32 => $^O eq 'MSWin32';
 require IPC::Run if MSWin32;
@@ -74,9 +65,6 @@ my $_spawn = sub {
         );
     }
     else {
-        local *STDIN = $REAL_STDIN;
-        local *STDOUT = $REAL_STDOUT;
-        local *STDERR = $REAL_STDERR;
         $pid = eval { open3( $in, $out, $err, @cmd ); };
     }
 
