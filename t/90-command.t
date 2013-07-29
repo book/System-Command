@@ -11,6 +11,6 @@ use System::Command;
 
 plan tests => 2;
 
-stdout_like(q{perl -le 'print STDOUT "STDOUT\n"'}, qr/STDOUT/, 'STDOUT');
-stderr_like(q{perl -le 'print STDERR "STDERR\n"'}, qr/STDERR/, 'STDERR');
+stdout_like(q{perl -le "print STDOUT 'STDOUT'"}, qr/STDOUT/, 'STDOUT');
+stderr_like(q{perl -le "print STDERR 'STDERR'"}, qr/STDERR/, 'STDERR');
 
