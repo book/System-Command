@@ -10,7 +10,7 @@ plan skip_all => 'This test script  does not make sense under Win32'
 
 my @fail = (
     {   cmdline => ['does-not-exist'],
-        fail    => qr/^open3: exec of does-not-exist failed at /,
+        fail    => qr/^Can't exec\( does-not-exist \): /,
     },
 );
 

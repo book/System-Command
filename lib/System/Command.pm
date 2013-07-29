@@ -7,11 +7,11 @@ use 5.006;
 use Carp;
 use Cwd qw( cwd );
 use IO::Handle;
-use IPC::Open3 qw( open3 );
 use Symbol ();
 use List::Util qw( reduce );
 
 use Config;
+use Fcntl ();
 use POSIX ":sys_wait_h";
 use constant STATUS  => qw( exit signal core );
 
@@ -55,6 +55,9 @@ my $_spawn = sub {
     my $out = Symbol::gensym;
     my $err = Symbol::gensym;
 
+    # no buffering on pipes used for writing
+    select( ( select($in), $| = 1 )[0] );
+
     # start the command
     if (MSWin32) {
         $pid = IPC::Run::start(
@@ -65,7 +68,82 @@ my $_spawn = sub {
         );
     }
     else {
-        $pid = open3( $in, $out, $err, @cmd );
+
+        # the code below takes inspiration from IPC::Open3 and Sys::Cmd
+
+        # create handles for the child process (using CAPITALS)
+        my $IN  = Symbol::gensym;
+        my $OUT = Symbol::gensym;
+        my $ERR = Symbol::gensym;
+
+        # no buffering on pipes used for writing
+        select( ( select($OUT), $| = 1 )[0] );
+        select( ( select($ERR), $| = 1 )[0] );
+
+        # connect parent and child with pipes
+        pipe $IN,  $in  or croak "input pipe(): $!";
+        pipe $out, $OUT or croak "output pipe(): $!";
+        pipe $err, $ERR or croak "errput pipe(): $!";
+
+        # an extra pipe to communicate exec() failure
+        pipe my $stat_r, my $stat_w;
+
+        # create the child process
+        $pid = fork;
+        croak "Can't fork: $!" if !defined $pid;
+
+        if ($pid) {
+
+            # parent won't use those handles
+            close $stat_w;
+            close $IN;
+            close $OUT;
+            close $ERR;
+
+            # failed to fork+exec?
+            my $mesg = do { local $/; <$stat_r> };
+            die $mesg if $mesg;
+        }
+        else {    # kid
+
+            # use $stat_r to communicate errors back to the parent
+            eval {
+
+                # child won't use those handles
+                close $stat_r;
+                close $in;
+                close $out;
+                close $err;
+
+                # close $stat_w on exec
+                my $flags = fcntl( $stat_w, Fcntl::F_GETFD, 0 )
+                    or croak "fcntl GETFD failed: $!";
+                fcntl( $stat_w, Fcntl::F_SETFD, $flags | Fcntl::FD_CLOEXEC )
+                    or croak "fcntl SETFD failed: $!";
+
+                # associate STDIN, STDOUT and STDERR to the pipes
+                my ( $fd_IN, $fd_OUT, $fd_ERR )
+                    = ( fileno $IN, fileno $OUT, fileno $ERR );
+                open \*STDIN, "<&=$fd_IN"
+                    or croak "Can't open( \\*STDIN, '<&=$fd_IN' ): $!";
+                open \*STDOUT, ">&=$fd_OUT"
+                    or croak "Can't open( \\*STDOUT, '<&=$fd_OUT' ): $!";
+                open \*STDERR, ">&=$fd_ERR"
+                    or croak "Can't open( \\*STDERR, '<&=$fd_ERR' ): $!";
+
+                # and finally, exec into @cmd
+                exec( { $cmd[0] } @cmd )
+                    or do { croak "Can't exec( @cmd ): $!"; }
+            };
+
+            # something went wrong
+            print $stat_w $@;
+            close $stat_w;
+
+            # DIE DIE DIE
+            eval { require POSIX; POSIX::_exit(255); };
+            exit 255;
+        }
     }
 
     return ( $pid, $in, $out, $err );

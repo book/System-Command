@@ -11,7 +11,6 @@ my $builder = Module::Build->new(
         'Test::More' => 0,
     },
     requires         => {
-        'IPC::Open3' => 0,
         'Carp'       => 0,
         'Cwd'        => 0,
         'IO::Handle' => 0,

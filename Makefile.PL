@@ -13,7 +13,6 @@ WriteMakefile(
     PL_FILES            => {},
     PREREQ_PM => {
         'Test::More' => 0,
-        'IPC::Open3' => 0,
         'Carp'       => 0,
         'Cwd'        => 0,
         'IO::Handle' => 0,
