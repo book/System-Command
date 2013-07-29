@@ -65,7 +65,7 @@ my $_spawn = sub {
         );
     }
     else {
-        $pid = eval { open3( $in, $out, $err, @cmd ); };
+        $pid = open3( $in, $out, $err, @cmd );
     }
 
     return ( $pid, $in, $out, $err );
