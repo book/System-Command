@@ -11,7 +11,7 @@ use Symbol ();
 use List::Util qw( reduce );
 
 use Config;
-use Fcntl ();
+use Fcntl qw( F_GETFD F_SETFD FD_CLOEXEC );
 use POSIX ":sys_wait_h";
 use constant STATUS  => qw( exit signal core );
 
@@ -116,9 +116,9 @@ my $_spawn = sub {
                 close $err;
 
                 # close $stat_w on exec
-                my $flags = fcntl( $stat_w, Fcntl::F_GETFD, 0 )
+                my $flags = fcntl( $stat_w, F_GETFD, 0 )
                     or croak "fcntl GETFD failed: $!";
-                fcntl( $stat_w, Fcntl::F_SETFD, $flags | Fcntl::FD_CLOEXEC )
+                fcntl( $stat_w, F_SETFD, $flags | FD_CLOEXEC )
                     or croak "fcntl SETFD failed: $!";
 
                 # associate STDIN, STDOUT and STDERR to the pipes
