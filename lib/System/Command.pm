@@ -294,9 +294,9 @@ System::Command - Object for running system commands
     $cmd = System::Command->new( @cmd, \%option );
 
     # $cmd is basically a hash, with keys / accessors
-    $cmd->stdin();     # filehandle to the process' stdin (write)
-    $cmd->stdout();    # filehandle to the process' stdout (read)
-    $cmd->stderr();    # filehandle to the process' stdout (read)
+    $cmd->stdin();     # filehandle to the process stdin (write)
+    $cmd->stdout();    # filehandle to the process stdout (read)
+    $cmd->stderr();    # filehandle to the process stdout (read)
     $cmd->pid();       # pid of the child process
 
     # find out if the child process died
