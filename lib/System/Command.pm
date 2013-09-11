@@ -19,8 +19,6 @@ use constant STATUS  => qw( exit signal core );
 use constant MSWin32 => $^O eq 'MSWin32';
 require IPC::Run if MSWin32;
 
-our $VERSION = '1.100';
-
 our $QUIET = 0;
 
 sub import {
@@ -201,9 +199,7 @@ sub close {
 
 __END__
 
-=head1 NAME
-
-System::Command - Object for running system commands
+# ABSTRACT: Object for running system commands
 
 =head1 SYNOPSIS
 
