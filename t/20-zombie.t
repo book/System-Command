@@ -9,12 +9,12 @@ eval "use Time::HiRes qw( time )";
 
 my @cmd = ( $^X, File::Spec->catfile( t => 'fail.pl' ) );
 
-my $win32 = $^O eq 'MSWin32';
+my $win32  = $^O eq 'MSWin32';
 my $cygwin = $^O eq 'cygwin';
 
 # under Win32, $SIG{CHLD} = 'IGNORE' has no effect,
 # and we do not get the expected warnings
-plan tests => 28 + ( $win32 ? -2 : 0 ) + ($cygwin ? -1 : 0);
+plan tests => my $tests + ( $win32 ? -2 : $cygwin ? -1 : 0 );
 
 my $status = 1;
 my $delay  = 2;
@@ -41,6 +41,7 @@ $SIG{__WARN__} = sub {
 };
 
 # the standard stuff
+BEGIN { $tests += 10 }
 {
 
     # just started the command
@@ -66,12 +67,13 @@ $SIG{__WARN__} = sub {
 }
 
 # what if our user decided to reap children automatically?
+BEGIN { $tests += 16 + 2 } # tests + tests within $SIG{__WARN__}
 {
     diag q{$SIG{CHLD} = 'IGNORE'};
     local $SIG{CHLD} = 'IGNORE';
     $expect_CHLD_warning = 1;
     my $cmd = System::Command->new( @cmd, $status, $delay );
-    ok( !$cmd->is_terminated, 'child still alive' );
+    ok( !$cmd->is_terminated, 'child still alive' );    # should warn
     is( $cmd->exit, undef, 'no exit status' );
 
     # leave it time to die
@@ -94,7 +96,7 @@ $SIG{__WARN__} = sub {
 
     # close first
     $cmd = System::Command->new( @cmd, $status, $delay );
-    ok( !$cmd->is_terminated, 'child still alive' );
+    ok( !$cmd->is_terminated, 'child still alive' );    # should warn
     is( $cmd->exit, undef, 'no exit status' );
 
     # don't leave it time, just choke it now
