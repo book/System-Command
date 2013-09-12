@@ -7,7 +7,8 @@ use File::Spec;
 # show more precise times if possible
 eval "use Time::HiRes qw( time )";
 
-my @cmd = ( $^X, File::Spec->catfile( t => 'fail.pl' ) );
+my @cmd  = ( $^X, File::Spec->catfile( t => 'fail.pl' ) );
+my @cmd2 = ( $^X, File::Spec->catfile( t => 'lines.pl' ) );
 
 my $win32  = $^O eq 'MSWin32';
 my $cygwin = $^O eq 'cygwin';
@@ -117,6 +118,31 @@ BEGIN { $tests += 16 + 2 } # tests + tests within $SIG{__WARN__}
         : is( $cmd->exit, -1,      'BOGUS exit status collected' );
     ok( !$cmd->stdout->opened, 'stdout closed' );
     ok( !$cmd->stderr->opened, 'stderr closed' );
+}
+
+# this code: my $fh = System::Command->new( @cmd )->stdout
+# will create a zombie process with the current implementation
+BEGIN { $tests += 4 }
+{
+    diag 'hunting for zombies';
+    my $pid;
+    my $fh = do {
+        my $zed = System::Command->new( @cmd2, 1 );
+        $pid = $zed->pid;
+        $zed;
+        }
+        ->stdout;
+    ok( $_is_alive->($pid), "process $pid is still alive" );
+
+    my $ln = <$fh>;
+    is( $ln, "STDOUT line 1\n", 'scope: { $fh = cmd->fh }' );
+    ok( $_is_alive->($pid), "process $pid is still alive" );
+    $fh->close;
+
+TODO: {
+        local $TODO = 'zombies are roaming around if we lose the object';
+        ok( !$_is_alive->($pid), "process $pid should be dead" );    # zombie!
+    }
 }
 
 # don't confuse Test::More
