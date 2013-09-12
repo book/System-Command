@@ -1,5 +1,15 @@
 Revision history for System-Command
 
+{{$NEXT}}
+
+1.104 Thu Sep 12 2013
+        [ENHANCEMENTS]
+        - fixed for Perl versions < 5.8.9
+        [DOCUMENTATION]
+        - minor documentation improvements
+        [PACKAGING]
+        - switch to Dist::Zilla for maintaining the distribution
+
 1.103 Mon Jul 29 2013
         [ENHANCEMENTS]
         - rewrote the _spawn code to work properly under Plack
