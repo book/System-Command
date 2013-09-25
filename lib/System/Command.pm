@@ -113,6 +113,9 @@ my $_spawn = sub {
                 close $out;
                 close $err;
 
+                # setup process group if possible
+                setpgrp 0, 0 if $Config{d_setpgrp};
+
                 # close $stat_w on exec
                 my $flags = fcntl( $stat_w, F_GETFD, 0 )
                     or croak "fcntl GETFD failed: $!";
