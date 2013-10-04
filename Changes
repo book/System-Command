@@ -2,6 +2,11 @@ Revision history for System-Command
 
 {{$NEXT}}
 
+1.105 Sat Oct 5 2013
+        [TESTS]
+        - add a TODO test for the zombie processes created in certain cases
+        - various other test improvements
+
 1.104 Thu Sep 12 2013
         [ENHANCEMENTS]
         - fixed for Perl versions < 5.8.9
