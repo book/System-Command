@@ -126,25 +126,37 @@ BEGIN { $tests += 4 }
 {
     diag 'hunting for zombies';
     my $pid;
-    my $fh = do {
-        my $zed = System::Command->new( @cmd2, 1 );
-        $pid = $zed->pid;
-        $zed;
-        }
-        ->stdout;
-    ok( $_is_alive->($pid), "process $pid is still alive" );
+    {
+        my $fh = do {
+            my $zed = System::Command->new( @cmd2, 1 );
+            $pid = $zed->pid;
+            $zed;
+            }
+            ->stdout;
 
-    my $ln = <$fh>;
-    is( $ln, "STDOUT line 1\n", 'scope: { $fh = cmd->fh }' );
-    ok( $_is_alive->($pid), "process $pid is still alive" );
-    $fh->close;
+        # zombies do not exist under win32
+        my $blip = $_is_alive->($pid);
+        $win32
+            ? ok( !$blip, "process $pid is gone" )
+            : ok( $blip,  "process $pid is still alive" );
+
+        my $ln = <$fh>;
+        is( $ln, "STDOUT line 1\n", 'scope: { $fh = cmd->fh }' );
+
+        $blip = $_is_alive->($pid);
+        $win32
+            ? ok( !$blip, "process $pid is gone" )
+            : ok( $blip,  "process $pid is still alive" );
+        $fh->close;
+    }
 
 TODO: {
-        local $TODO = 'zombies are roaming around if we lose the object';
-        ok( !$_is_alive->($pid), "process $pid should be dead" );    # zombie!
+        local $TODO = $win32
+            ? ''    # no zombies on Win32
+            : 'zombies are roaming around if we lose the object';    # zombie!
+        ok( !$_is_alive->($pid), "process $pid should be dead" );
     }
 }
 
 # don't confuse Test::More
 $? = 0;
-
