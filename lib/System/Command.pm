@@ -9,11 +9,10 @@ use Cwd qw( cwd );
 use IO::Handle;
 use Symbol ();
 use List::Util qw( reduce );
+use System::Command::Reaper;
 
 use Config;
 use Fcntl qw( F_GETFD F_SETFD FD_CLOEXEC );
-use POSIX ":sys_wait_h";
-use constant STATUS  => qw( exit signal core );
 
 # MSWin32 support
 use constant MSWin32 => $^O eq 'MSWin32';
@@ -150,11 +149,6 @@ my $_spawn = sub {
     return ( $pid, $in, $out, $err );
 };
 
-# this is necessary, because kill(0,pid) is misimplemented in perl core
-my $_is_alive = MSWin32
-    ? sub { return `tasklist /FO CSV /NH /fi "PID eq $_[0]"` =~ /^"/ }
-    : sub { return kill 0, $_[0]; };
-
 # module methods
 sub new {
     my ( $class, @cmd ) = @_;
@@ -221,6 +215,10 @@ sub new {
       ( _ipc_run => $pid )x!! MSWin32,
     }, $class;
 
+    # create the subprocess reaper and link the handles and command to it
+    ${*$in} = ${*$out} = ${*$err} = $self->{reaper}    # typeglobs FTW
+        = System::Command::Reaper->new($self);
+
     return $self;
 }
 
@@ -229,52 +227,9 @@ sub spawn {
     return @{ $class->new(@cmd) }{qw( pid stdin stdout stderr )};
 }
 
-sub is_terminated {
-    my ($self) = @_;
-    my $pid = $self->{pid};
-
-    # Zed's dead, baby. Zed's dead.
-    return $pid if !$_is_alive->($pid) and exists $self->{exit};
-
-    # If that is a re-animated body, we're gonna have to kill it.
-    return $self->_reap(WNOHANG);
-}
-
-sub _reap {
-    my ( $self, @flags ) = @_;
-    my $pid = $self->{pid};
-
-    if ( my $reaped = waitpid( $pid, @flags ) and !exists $self->{exit} ) {
-        my $zed = $reaped == $pid;
-        carp "Child process already reaped, check for a SIGCHLD handler"
-            if !$zed && !$QUIET;
-
-        @{$self}{ STATUS() }
-            = $zed
-            ? ( $? >> 8, $? & 127, $? & 128 )
-            : ( -1, -1, -1 );
-
-        return $reaped;    # It's dead, Jim!
-    }
-
-    # Look! It's moving. It's alive. It's alive...
-    return;
-}
-
-sub close {
-    my ($self) = @_;
-
-    # close all pipes
-    my ( $in, $out, $err ) = @{$self}{qw( stdin stdout stderr )};
-    $in  and $in->opened  and $in->close  || carp "error closing stdin: $!";
-    $out and $out->opened and $out->close || carp "error closing stdout: $!";
-    $err and $err->opened and $err->close || carp "error closing stderr: $!";
-
-    # and wait for the child (if any)
-    $self->_reap();
-
-    return $self;
-}
+# delegate those to the reaper
+sub is_terminated { $_[0]{reaper}->is_terminated() }
+sub close         { $_[0]{reaper}->close() }
 
 1;
 
@@ -301,7 +256,7 @@ __END__
     # find out if the child process died
     if ( $cmd->is_terminated() ) {
         # the handles are not closed yet
-        # but $cmd->exit() et al. are available
+        # but $cmd->exit() et al. are available if it's dead
     }
 
     # done!
@@ -387,7 +342,7 @@ Returns a true value if the underlying process was terminated.
 
 If the process was indeed terminated, collects exit status, etc.
 and defines the same attributes as C<close()>, but does B<not> close
-all pipes to the child process,
+all pipes to the child process.
 
 
 =head2 spawn( @cmd )
@@ -506,6 +461,11 @@ weren't related to Git.
 
 Thanks to Christian Walde (MITHALDU) for his help in making this
 module work better under Win32.
+
+The L<System::Command::Reaper> class was added after the addition
+of Git::Repository::Command::Reaper in L<Git::Repository::Command> 1.11.
+It was later removed from L<System::Command> version 1.03, and brought
+back from the dead to deal with the zombie apocalypse in version 1.106.
 
 =head1 BUGS
 
