@@ -150,12 +150,7 @@ BEGIN { $tests += 4 }
         $fh->close;
     }
 
-TODO: {
-        local $TODO = $win32
-            ? ''    # no zombies on Win32
-            : 'zombies are roaming around if we lose the object';    # zombie!
-        ok( !$_is_alive->($pid), "process $pid should be dead" );
-    }
+    ok( !$_is_alive->($pid), "process $pid should be dead" );
 }
 
 # don't confuse Test::More
