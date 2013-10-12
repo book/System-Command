@@ -2,6 +2,16 @@ Revision history for System-Command
 
 {{$NEXT}}
 
+1.106 Sat Oct 12 2013
+        [ENHANCEMENTS]
+        - brought back System::Command::Reaper, which properly deals
+          with zombies
+        - execute the command in its own process group whenever possible
+          (thanks to Vincent Pit)
+        [TESTS]
+        - test for the zombie processes is not TODO anymore
+        - tests for the timely destruction of the reaper are back
+
 1.105 Sat Oct 5 2013
         [TESTS]
         - add a TODO test for the zombie processes created in certain cases
