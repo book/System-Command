@@ -91,9 +91,7 @@ sub DESTROY {
 
 __END__
 
-=head1 NAME
-
-System::Command::Reaper - Reap processes started by System::Command
+# ABSTRACT: Reap processes started by System::Command
 
 =head1 SYNOPSIS
 
