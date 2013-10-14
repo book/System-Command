@@ -13,5 +13,3 @@ do {
     ok(! ( $? >> 8 ), $_ );
 }
     for reverse sort map { s!/!::!g; s/\.pm$//; s/^lib:://; $_ } @modules;
-
-diag("Tested System::Command $System::Command::VERSION, Perl $], $^X");
