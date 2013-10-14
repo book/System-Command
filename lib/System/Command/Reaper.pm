@@ -34,7 +34,7 @@ sub is_terminated {
     my $pid = $self->{pid};
 
     # Zed's dead, baby. Zed's dead.
-    return $pid if !$_is_alive->($pid) and exists $self->{command}{exit};
+    return $pid if !$_is_alive->($pid) and exists $self->{exit};
 
     # If that is a re-animated body, we're gonna have to kill it.
     return $self->_reap(WNOHANG);
@@ -44,13 +44,12 @@ sub _reap {
     my ( $self, @flags ) = @_;
     my $pid = $self->{pid};
 
-    if ( my $reaped = waitpid( $pid, @flags )
-        and !exists $self->{command}{exit} )
-    {
+    if ( my $reaped = waitpid( $pid, @flags ) and !exists $self->{exit} ) {
         my $zed = $reaped == $pid;
         carp "Child process already reaped, check for a SIGCHLD handler"
             if !$zed && !$System::Command::QUIET;
 
+        # What do you think? "Zombie Kill of the Week"?
         @{$self}{ STATUS() }
             = $zed
             ? ( $? >> 8, $? & 127, $? & 128 )
