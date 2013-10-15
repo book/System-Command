@@ -74,11 +74,12 @@ BEGIN { $tests += 16 + 2 } # tests + tests within $SIG{__WARN__}
     local $SIG{CHLD} = 'IGNORE';
     $expect_CHLD_warning = 1;
     my $cmd = System::Command->new( @cmd, $status, $delay );
-    ok( !$cmd->is_terminated, 'child still alive' );    # should warn
+    ok( !$cmd->is_terminated, 'child still alive' );
     is( $cmd->exit, undef, 'no exit status' );
 
     # leave it time to die
     sleep $delay + 1;
+    diag "\$cmd->is_terminated should warn" if !$win32;
     ok( $cmd->is_terminated, 'child was reaped' );    # was dead and gone
     $win32
         ? is( $cmd->exit, $status, 'exit status collected' )
@@ -97,10 +98,11 @@ BEGIN { $tests += 16 + 2 } # tests + tests within $SIG{__WARN__}
 
     # close first
     $cmd = System::Command->new( @cmd, $status, $delay );
-    ok( !$cmd->is_terminated, 'child still alive' );    # should warn
+    ok( !$cmd->is_terminated, 'child still alive' );
     is( $cmd->exit, undef, 'no exit status' );
 
     # don't leave it time, just choke it now
+    diag "\$cmd->close should warn" if !$win32;
     $cmd->close;
 
     # See http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=666631#17
