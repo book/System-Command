@@ -44,10 +44,11 @@ sub _reap {
     my ( $self, @flags ) = @_;
     my $pid = $self->{pid};
 
+    # REPENT/THE END IS/EXTREMELY/FUCKING/NIGH
     if ( my $reaped = waitpid( $pid, @flags ) and !exists $self->{exit} ) {
         my $zed = $reaped == $pid;
         carp "Child process already reaped, check for a SIGCHLD handler"
-            if !$zed && !$System::Command::QUIET;
+            if !$zed && !$System::Command::QUIET && !MSWin32;
 
         # What do you think? "Zombie Kill of the Week"?
         @{$self}{ STATUS() }
@@ -55,7 +56,7 @@ sub _reap {
             ? ( $? >> 8, $? & 127, $? & 128 )
             : ( -1, -1, -1 );
 
-        # does our creator still exist?
+        # Who died and made you fucking king of the zombies?
         @{ $self->{command} }{ STATUS() } = @{$self}{ STATUS() }
             if defined $self->{command};
 
