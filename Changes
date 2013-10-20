@@ -2,6 +2,16 @@ Revision history for System-Command
 
 {{$NEXT}}
 
+1.107 Sun Oct 20 2013
+        [ENHANCEMENTS]
+        - zombies do not exist under Win32, so no need to warn about
+          waitpid return value (many thanks to MITHALDU for his
+          continued help in testing on this platform)
+        [DOCUMENTATION]
+        - removed duplicated NAME section
+        [FUN]
+        - more zombie quotes in System::Command::Reaper comments
+
 1.106 Sat Oct 12 2013
         [ENHANCEMENTS]
         - brought back System::Command::Reaper, which properly deals
