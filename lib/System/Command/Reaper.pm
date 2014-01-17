@@ -137,12 +137,16 @@ C<close()> method is being called).
 
 System::Command::Reaper supports the following methods:
 
-=head2 new( $command )
+=head2 new
+
+    my $reaper = System::Command::Reaper->new( $cmd );
 
 Create a new System::Command::Reaper object attached to the
 L<System::Command> object passed as a parameter.
 
-=head2 close()
+=head2 close
+
+    $reaper->close();
 
 Close all the opened filehandles of the main L<System::Command> object,
 reaps the child process, and updates the main object with the status
@@ -150,7 +154,9 @@ information of the child process.
 
 C<DESTROY> calls C<close()> when the sentinel is being destroyed.
 
-=head2 is_terminated()
+=head2 is_terminated
+
+    if ( $reaper->is_terminated ) {...}
 
 Returns a true value if the underlying process was terminated.
 

@@ -280,7 +280,9 @@ through their C<STDIN>, C<STDOUT> and C<STDERR> handles.
 
 System::Command supports the following methods:
 
-=head2 new( @cmd )
+=head2 new
+
+    my $cmd = System::Command->new( @cmd )
 
 Runs an external command using the list in C<@cmd>.
 
@@ -331,12 +333,16 @@ The System::Command object returned by C<new()> has a number of
 attributes defined (see below).
 
 
-=head2 close()
+=head2 close
+
+    $cmd->close;
 
 Close all pipes to the child process, collects exit status, etc.
 and defines a number of attributes (see below).
 
-=head2 is_terminated()
+=head2 is_terminated
+
+    if ( $cmd->is_terminated ) {...}
 
 Returns a true value if the underlying process was terminated.
 
@@ -345,7 +351,9 @@ and defines the same attributes as C<close()>, but does B<not> close
 all pipes to the child process.
 
 
-=head2 spawn( @cmd )
+=head2 spawn
+
+    my ( $pid, $in, $out, $err ) = System::Command->spawn(@cmd);
 
 This shortcut method calls C<new()> (and so accepts options in the same
 manner) and directly returns the C<pid>, C<stdin>, C<stdout> and C<stderr>
