@@ -272,13 +272,13 @@ __END__
 
 =head1 DESCRIPTION
 
-C<System::Command> is a class that launches external system commands
+System::Command is a class that launches external system commands
 and return an object representing them, allowing to interact with them
 through their C<STDIN>, C<STDOUT> and C<STDERR> handles.
 
 =head1 METHODS
 
-C<System::Command> supports the following methods:
+System::Command supports the following methods:
 
 =head2 new( @cmd )
 
@@ -327,7 +327,7 @@ an exception.
 
 =back
 
-The C<System::Command> object returned by C<new()> has a number of
+The System::Command object returned by C<new()> has a number of
 attributes defined (see below).
 
 
@@ -354,7 +354,7 @@ attributes, in that order.
 
 =head2 Accessors
 
-The attributes of a C<System::Command> object are also accessible
+The attributes of a System::Command object are also accessible
 through a number of accessors.
 
 The object returned by C<new()> will have the following attributes defined:
@@ -392,7 +392,7 @@ Regarding the handles to the child process, note that in the following code:
     my $fh = System::Command->new( @cmd )->stdout;
 
 C<$fh> is opened and points to the output handle of the child process,
-while the anonymous C<System::Command> object has been destroyed. Once
+while the anonymous System::Command object has been destroyed. Once
 C<$fh> is destroyed, the subprocess will be reaped, thus avoiding zombies.
 
 
@@ -417,19 +417,19 @@ The signal, if any, that killed the command.
 
 =head1 CAVEAT EMPTOR
 
-Note that C<System::Command> uses C<waitpid()> to catch the status
+Note that System::Command uses C<waitpid()> to catch the status
 information of the child processes it starts. This means that if your
 code (or any module you C<use>) does something like the following:
 
     local $SIG{CHLD} = 'IGNORE';    # reap child processes
 
-C<System::Command> will not be able to capture the C<exit>, C<core>
+System::Command will not be able to capture the C<exit>, C<core>
 and C<signal> attributes. It will instead set all of them to the
 impossible value C<-1>, and display the warning
 C<Child process already reaped, check for a SIGCHLD handler>.
 
 To silence this warning (and accept the impossible status information),
-load C<System::Command> with:
+load System::Command with:
 
     use System::Command -quiet;
 
@@ -437,7 +437,7 @@ It is also possible to more finely control the warning by setting
 the C<$System::Command::QUIET> variable (the warning is not emitted
 if the variable is set to a true value).
 
-If the subprocess started by C<System::Command> has a short life
+If the subprocess started by System::Command has a short life
 expectancy, and no other child process is expected to die during that
 time, you could even disable the handler locally (use at your own risks):
 
@@ -454,9 +454,9 @@ Philippe Bruhat (BooK), C<< <book at cpan.org> >>
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Alexis Sukrieh (SUKRIA) who, when he saw the description of
-C<Git::Repository::Command> during my talk at OSDC.fr 2010, asked
+L<Git::Repository::Command> during my talk at OSDC.fr 2010, asked
 why it was not an independent module. This module was started by
-taking out of C<Git::Repository::Command> 1.08 the parts that
+taking out of L<Git::Repository::Command> 1.08 the parts that
 weren't related to Git.
 
 Thanks to Christian Walde (MITHALDU) for his help in making this
