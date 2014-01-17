@@ -402,7 +402,7 @@ Regarding the handles to the child process, note that in the following code:
 C<$fh> is opened and points to the output handle of the child process,
 while the anonymous System::Command object has been destroyed. Once
 C<$fh> is destroyed, the subprocess will be reaped, thus avoiding zombies.
-
+(L<System::Command::Reaper> undertakes this process.)
 
 After the call to C<close()> or after C<is_terminated()> returns true,
 the following attributes will be defined:
