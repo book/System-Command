@@ -8,6 +8,7 @@ use Carp;
 use Cwd qw( cwd );
 use IO::Handle;
 use Symbol ();
+use Scalar::Util qw( blessed );
 use List::Util qw( reduce );
 use System::Command::Reaper;
 
@@ -190,6 +191,22 @@ sub new {
     # FIXME - better check error conditions
     croak $@ if !defined $pid;
 
+    # trace: should collapse into a coderef (or nothing)
+    my $logger;
+    if ( my $trace = $o->{trace} ) {
+        $logger
+            = ref $trace eq 'GLOB' ? sub { print {$trace} shift, "\n" }
+            : blessed $trace && $trace->can('print')
+                                   ? sub { $trace->print( shift() . "\n" ) }
+            : ref $trace eq 'CODE' ? $trace
+            :                        sub { print STDERR shift, "\n" };
+        $logger->( "System::Command: $pid - @cmd" );
+        $logger->( "System::Command: $pid - $_ = $o->{$_}" )
+            for grep { $_ ne 'env' } sort keys %$o;
+        $logger->( "System::Command: $pid - \$ENV{$_} = $o->{env}{$_}" )
+            for keys %{$o->{env}};
+    }
+
     # some input was provided
     if ( defined $o->{input} ) {
         local $SIG{PIPE}
@@ -212,6 +229,7 @@ sub new {
         stdin    => $in,
         stdout   => $out,
         stderr   => $err,
+        trace    => $logger,
       ( _ipc_run => $pid )x!! MSWin32,
     }, $class;
 
