@@ -191,20 +191,20 @@ sub new {
     # FIXME - better check error conditions
     croak $@ if !defined $pid;
 
-    # trace: should collapse into a coderef (or nothing)
-    my $logger;
-    if ( my $trace = $o->{trace} ) {
-        $logger
-            = ref $trace eq 'GLOB' ? sub { print {$trace} shift, "\n" }
-            : blessed $trace && $trace->can('print')
-                                   ? sub { $trace->print( shift() . "\n" ) }
-            : ref $trace eq 'CODE' ? $trace
-            :                        sub { print STDERR shift, "\n" };
-        $logger->( "System::Command: $pid - @cmd" );
-        $logger->( "System::Command: $pid - $_ = $o->{$_}" )
-            for grep { $_ ne 'env' } sort keys %$o;
-        $logger->( "System::Command: $pid - \$ENV{$_} = $o->{env}{$_}" )
-            for keys %{$o->{env}};
+    # trace is mostly a debugging tool
+    if ( $o->{trace} || $ENV{SYSTEM_COMMAND_TRACE} ) {
+        my ( $level, $file ) = split /=/,
+            $o->{trace} || $ENV{SYSTEM_COMMAND_TRACE} || '', 2;
+        my $th;
+        open $th, '>>', $file or carp "Can't open $file: $!" if $file;
+        $th ||= *STDERR;
+        print $th "System::Command: $pid - @cmd\n";
+        print $th map "System::Command: $pid - $_ = $o->{$_}\n",
+            grep { $_ ne 'env' } sort keys %$o
+            if $level > 1;
+        print $th map "System::Command: $pid - \$ENV{$_} = $o->{env}{$_}\n",
+            keys %{ $o->{env} || {} }
+            if $level > 2;
     }
 
     # some input was provided
@@ -229,7 +229,6 @@ sub new {
         stdin    => $in,
         stdout   => $out,
         stderr   => $err,
-        trace    => $logger,
       ( _ipc_run => $pid )x!! MSWin32,
     }, $class;
 
@@ -344,6 +343,33 @@ a way to modify previous options populated by some other part of the program.
 On some systems, some commands may close standard input on startup,
 which will cause a SIGPIPE when trying to write to it. This will raise
 an exception.
+
+=item C<trace>
+
+The C<trace> option defines the trace settings for System::Command.
+The C<SYSTEM_COMMAND_TRACE> environment variable can be used to specify
+a global trace setting.
+
+If C<trace> (or C<SYSTEM_COMMAND_TRACE>) contains an C<=> character then
+what follows it is used as the name of the file to append the trace to.
+
+At trace level 1, only the command line is shown:
+
+    System::Command: 12834 - /usr/bin/git rev-parse --git-dir
+
+At trace level 2, the options values are shown:
+
+    System::Command: 12834 - cwd = /tmp/pOjJzsKI7P
+    System::Command: 12833 - git = /usr/bin/git
+
+Note: the C<git> option in the example above is actually used by
+L<Git::Repository> to determine the command to be run, and ignored by
+System::Command.
+
+At trace level 3, the content of the C<env> option are also listed:
+
+    System::Command: 12834 - $ENV{GIT_AUTHOR_EMAIL} = author@example.com
+    System::Command: 12834 - $ENV{GIT_AUTHOR_NAME} = Example author
 
 =back
 
