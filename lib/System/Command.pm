@@ -22,14 +22,14 @@ require IPC::Run if MSWin32;
 our $QUIET = 0;
 
 # trace setup at startup
-my $trace_opts = sub {
+my $_trace_opts = sub {
     my ( $trace, $file, $th ) = split /=/, shift, 2;
     open $th, '>>', $file or carp "Can't open $file: $!" if $file;
     $th ||= *STDERR;
     return ( $trace, $th );
 };
 my @trace;
-@trace = $trace_opts->( $ENV{SYSTEM_COMMAND_TRACE} )
+@trace = $_trace_opts->( $ENV{SYSTEM_COMMAND_TRACE} )
     if $ENV{SYSTEM_COMMAND_TRACE};
 
 sub import {
@@ -161,7 +161,7 @@ my $_spawn = sub {
     return ( $pid, $in, $out, $err );
 };
 
-my $dump_ref = sub {
+my $_dump_ref = sub {
     require Data::Dumper;    # only load if needed
     local $Data::Dumper::Indent    = 0;
     local $Data::Dumper::Purity    = 0;
@@ -193,7 +193,7 @@ sub new {
 
     # open the trace file before changing directory
     my ( $trace, $th );
-    ( $trace, $th ) = $trace_opts->( $o->{trace} ) if $o->{trace};
+    ( $trace, $th ) = $_trace_opts->( $o->{trace} ) if $o->{trace};
     ( $trace, $th ) = @trace if @trace;    # environment override
 
     # chdir to the expected directory
@@ -225,13 +225,13 @@ sub new {
     # trace is mostly a debugging tool
     if ($trace) {
         print $th "System::Command: $pid - ",
-            join( ' ', map /\s/ ? $dump_ref->($_) : $_, @cmd ), "\n";
+            join( ' ', map /\s/ ? $_dump_ref->($_) : $_, @cmd ), "\n";
         print $th map "System::Command: $pid - $_->[0] = $_->[1]\n",
-            map [ $_ => $dump_ref->( $o->{$_} ) ],
+            map [ $_ => $_dump_ref->( $o->{$_} ) ],
             grep { $_ ne 'env' } sort keys %$o
             if $trace > 1;
         print $th map "System::Command: $pid - $_->[0] = $_->[1]\n",
-            map [ "\$ENV{$_}" => $dump_ref->( $o->{env}{$_} ) ],
+            map [ "\$ENV{$_}" => $_dump_ref->( $o->{env}{$_} ) ],
             keys %{ $o->{env} || {} }
             if $trace > 2;
     }
