@@ -175,14 +175,14 @@ my $_dump_ref = sub {
 
 my $_do_trace = sub {
     my ( $trace, $th, $pid, $cmd, $o ) = @_;
-    print $th "System::Command: $pid - ",
+    print $th "System::Command cmd[$pid]: ",
         join( ' ', map /\s/ ? $_dump_ref->($_) : $_, @$cmd ), "\n";
-    print $th map "System::Command: $pid - $_->[0] = $_->[1]\n",
+    print $th map "System::Command opt[$pid]: $_->[0] => $_->[1]\n",
         map [ $_ => $_dump_ref->( $o->{$_} ) ],
         grep { $_ ne 'env' } sort keys %$o
         if $trace > 1;
-    print $th map "System::Command: $pid - $_->[0] = $_->[1]\n",
-        map [ "\$ENV{$_}" => $_dump_ref->( $o->{env}{$_} ) ],
+    print $th map "System::Command env[$pid]: $_->[0] => $_->[1]\n",
+        map [ $_ => $_dump_ref->( $o->{env}{$_} ) ],
         keys %{ $o->{env} || {} }
         if $trace > 2;
 };
@@ -391,15 +391,15 @@ calling System::Command.
 
 At trace level 1, only the command line is shown:
 
-    System::Command: 12834 - /usr/bin/git commit -m "Test option hash in new()"
+    System::Command cmd[12834]: /usr/bin/git commit -m "Test option hash in new()"
 
 Note: Command-line parameters containing whitespace will be properly quoted.
 
 At trace level 2, the options values are shown:
 
-    System::Command: 12834 - cwd = "/tmp/kHkPUBIVWd"
-    System::Command: 12834 - fatal = {128 => 1,129 => 1}
-    System::Command: 12834 - git = "/usr/bin/git"
+    System::Command opt[12834]: cwd => "/tmp/kHkPUBIVWd"
+    System::Command opt[12834]: fatal => {128 => 1,129 => 1}
+    System::Command opt[12834]: git => "/usr/bin/git"
 
 Note: The C<fatal> and C<git> options in the example above is actually
 used by L<Git::Repository> to determine the command to be run, and
@@ -407,8 +407,8 @@ ignored by System::Command. References are dumped using L<Data::Dumper>.
 
 At trace level 3, the content of the C<env> option is also listed:
 
-    System::Command: 12834 - $ENV{GIT_AUTHOR_EMAIL} = "author\@example.com"
-    System::Command: 12834 - $ENV{GIT_AUTHOR_NAME} = "Example author"
+    System::Command env[12834]: GIT_AUTHOR_EMAIL => "author\@example.com"
+    System::Command env[12834]: GIT_AUTHOR_NAME => "Example author"
 
 If the command cannot be spawned, the trace will show C<!> instead of
 the pid:
