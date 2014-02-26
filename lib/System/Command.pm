@@ -168,6 +168,15 @@ sub new {
     }
     @o;
 
+    # open the trace file before changing directory
+    my ( $trace, $th );
+    if ( $o->{trace} || $ENV{SYSTEM_COMMAND_TRACE} ) {
+        ( $trace, my $file ) = split /=/,
+            $o->{trace} || $ENV{SYSTEM_COMMAND_TRACE} || '', 2;
+        open $th, '>>', $file or carp "Can't open $file: $!" if $file;
+        $th ||= *STDERR;
+    }
+
     # chdir to the expected directory
     my $orig = cwd;
     my $dest = defined $o->{cwd} ? $o->{cwd} : undef;
@@ -192,19 +201,14 @@ sub new {
     croak $@ if !defined $pid;
 
     # trace is mostly a debugging tool
-    if ( $o->{trace} || $ENV{SYSTEM_COMMAND_TRACE} ) {
-        my ( $level, $file ) = split /=/,
-            $o->{trace} || $ENV{SYSTEM_COMMAND_TRACE} || '', 2;
-        my $th;
-        open $th, '>>', $file or carp "Can't open $file: $!" if $file;
-        $th ||= *STDERR;
+    if ( $trace ) {
         print $th "System::Command: $pid - @cmd\n";
         print $th map "System::Command: $pid - $_ = $o->{$_}\n",
             grep { $_ ne 'env' } sort keys %$o
-            if $level > 1;
+            if $trace > 1;
         print $th map "System::Command: $pid - \$ENV{$_} = $o->{env}{$_}\n",
             keys %{ $o->{env} || {} }
-            if $level > 2;
+            if $trace > 2;
     }
 
     # some input was provided
