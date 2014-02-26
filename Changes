@@ -2,6 +2,13 @@ Revision history for System-Command
 
 {{$NEXT}}
 
+1.108 Wed Feb 26 2014
+        [ENHANCEMENTS]
+        - the trace option makes it possible to see exactly which commands
+          were spawned, with their options (including environment)
+        [DOCUMENTATION]
+        - style fixes
+
 1.107 Sun Oct 20 2013
         [ENHANCEMENTS]
         - zombies do not exist under Win32, so no need to warn about
