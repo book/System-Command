@@ -227,10 +227,11 @@ sub new {
         print $th "System::Command: $pid - ",
             join( ' ', map /\s/ ? $dump_ref->($_) : $_, @cmd ), "\n";
         print $th map "System::Command: $pid - $_->[0] = $_->[1]\n",
-            map [ $_ => ref $o->{$_} ? $dump_ref->( $o->{$_} ) : $o->{$_} ],
+            map [ $_ => $dump_ref->( $o->{$_} ) ],
             grep { $_ ne 'env' } sort keys %$o
             if $trace > 1;
-        print $th map "System::Command: $pid - \$ENV{$_} = $o->{env}{$_}\n",
+        print $th map "System::Command: $pid - $_->[0] = $_->[1]\n",
+            map [ "\$ENV{$_}" => $dump_ref->( $o->{env}{$_} ) ],
             keys %{ $o->{env} || {} }
             if $trace > 2;
     }
@@ -389,9 +390,9 @@ Note: Command-line parameters containing whitespace will be properly quoted.
 
 At trace level 2, the options values are shown:
 
-    System::Command: 12834 - cwd = /tmp/kHkPUBIVWd
+    System::Command: 12834 - cwd = "/tmp/kHkPUBIVWd"
     System::Command: 12834 - fatal = {128 => 1,129 => 1}
-    System::Command: 12834 - git = /usr/bin/git
+    System::Command: 12834 - git = "/usr/bin/git"
 
 Note: The C<fatal> and C<git> options in the example above is actually
 used by L<Git::Repository> to determine the command to be run, and
@@ -399,8 +400,8 @@ ignored by System::Command. References are dumped using L<Data::Dumper>.
 
 At trace level 3, the content of the C<env> option is also listed:
 
-    System::Command: 12834 - $ENV{GIT_AUTHOR_EMAIL} = author@example.com
-    System::Command: 12834 - $ENV{GIT_AUTHOR_NAME} = Example author
+    System::Command: 12834 - $ENV{GIT_AUTHOR_EMAIL} = "author\@example.com"
+    System::Command: 12834 - $ENV{GIT_AUTHOR_NAME} = "Example author"
 
 =back
 
