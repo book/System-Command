@@ -407,6 +407,11 @@ At trace level 3, the content of the C<env> option is also listed:
     System::Command: 12834 - $ENV{GIT_AUTHOR_EMAIL} = "author\@example.com"
     System::Command: 12834 - $ENV{GIT_AUTHOR_NAME} = "Example author"
 
+If the command cannot be spawned, the trace will show C<!> instead of
+the pid:
+
+    System::Command: ! - does-not-exist
+
 =back
 
 The System::Command object returned by C<new()> has a number of
