@@ -150,6 +150,18 @@ my $_spawn = sub {
     return ( $pid, $in, $out, $err );
 };
 
+my $dump_ref = sub {
+    require Data::Dumper;    # only load if needed
+    local $Data::Dumper::Indent    = 0;
+    local $Data::Dumper::Purity    = 0;
+    local $Data::Dumper::Maxdepth  = 0;
+    local $Data::Dumper::Quotekeys = 0;
+    local $Data::Dumper::Sortkeys  = 1;
+    local $Data::Dumper::Useqq     = 1;
+    local $Data::Dumper::Terse     = 1;
+    return Data::Dumper->Dump( [shift] );
+};
+
 # module methods
 sub new {
     my ( $class, @cmd ) = @_;
@@ -204,9 +216,10 @@ sub new {
     }
 
     # trace is mostly a debugging tool
-    if ( $trace ) {
+    if ($trace) {
         print $th "System::Command: $pid - @cmd\n";
-        print $th map "System::Command: $pid - $_ = $o->{$_}\n",
+        print $th map "System::Command: $pid - $_->[0] = $_->[1]\n",
+            map [ $_ => ref $o->{$_} ? $dump_ref->( $o->{$_} ) : $o->{$_} ],
             grep { $_ ne 'env' } sort keys %$o
             if $trace > 1;
         print $th map "System::Command: $pid - \$ENV{$_} = $o->{env}{$_}\n",
