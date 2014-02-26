@@ -377,10 +377,14 @@ an exception.
 
 The C<trace> option defines the trace settings for System::Command.
 The C<SYSTEM_COMMAND_TRACE> environment variable can be used to specify
-a global trace setting.
+a global trace setting at startup. The environment variable overrides
+individual C<trace> options.
 
-If C<trace> (or C<SYSTEM_COMMAND_TRACE>) contains an C<=> character then
+If C<trace> or C<SYSTEM_COMMAND_TRACE> contains an C<=> character then
 what follows it is used as the name of the file to append the trace to.
+When using the C<trace> option, it is recommended to use an absolute
+path for the trace file, in case the main program C<chdir()> before
+calling System::Command.
 
 At trace level 1, only the command line is shown:
 
