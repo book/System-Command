@@ -224,7 +224,8 @@ sub new {
 
     # trace is mostly a debugging tool
     if ($trace) {
-        print $th "System::Command: $pid - @cmd\n";
+        print $th "System::Command: $pid - ",
+            join( ' ', map /\s/ ? $dump_ref->($_) : $_, @cmd ), "\n";
         print $th map "System::Command: $pid - $_->[0] = $_->[1]\n",
             map [ $_ => ref $o->{$_} ? $dump_ref->( $o->{$_} ) : $o->{$_} ],
             grep { $_ ne 'env' } sort keys %$o
