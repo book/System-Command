@@ -198,7 +198,10 @@ sub new {
     my ( $pid, $in, $out, $err ) = eval { $_spawn->(@cmd); };
 
     # FIXME - better check error conditions
-    croak $@ if !defined $pid;
+    if ( !defined $pid ) {
+        print $th "System::Command: ! - @cmd\n";
+        croak $@;
+    }
 
     # trace is mostly a debugging tool
     if ( $trace ) {
