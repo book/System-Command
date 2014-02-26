@@ -21,6 +21,17 @@ require IPC::Run if MSWin32;
 
 our $QUIET = 0;
 
+# trace setup at startup
+my $trace_opts = sub {
+    my ( $trace, $file, $th ) = split /=/, shift, 2;
+    open $th, '>>', $file or carp "Can't open $file: $!" if $file;
+    $th ||= *STDERR;
+    return ( $trace, $th );
+};
+my @trace;
+@trace = $trace_opts->( $ENV{SYSTEM_COMMAND_TRACE} )
+    if $ENV{SYSTEM_COMMAND_TRACE};
+
 sub import {
     my ( $class, @args ) = @_;
     my %arg = ( quiet => sub { $QUIET = 1 } );
@@ -182,12 +193,8 @@ sub new {
 
     # open the trace file before changing directory
     my ( $trace, $th );
-    if ( $o->{trace} || $ENV{SYSTEM_COMMAND_TRACE} ) {
-        ( $trace, my $file ) = split /=/,
-            $o->{trace} || $ENV{SYSTEM_COMMAND_TRACE} || '', 2;
-        open $th, '>>', $file or carp "Can't open $file: $!" if $file;
-        $th ||= *STDERR;
-    }
+    ( $trace, $th ) = $trace_opts->( $o->{trace} ) if $o->{trace};
+    ( $trace, $th ) = @trace if @trace;    # environment override
 
     # chdir to the expected directory
     my $orig = cwd;
