@@ -383,18 +383,21 @@ what follows it is used as the name of the file to append the trace to.
 
 At trace level 1, only the command line is shown:
 
-    System::Command: 12834 - /usr/bin/git rev-parse --git-dir
+    System::Command: 12834 - /usr/bin/git commit -m "Test option hash in new()"
+
+Note: Command-line parameters containing whitespace will be properly quoted.
 
 At trace level 2, the options values are shown:
 
-    System::Command: 12834 - cwd = /tmp/pOjJzsKI7P
-    System::Command: 12833 - git = /usr/bin/git
+    System::Command: 12834 - cwd = /tmp/kHkPUBIVWd
+    System::Command: 12834 - fatal = {128 => 1,129 => 1}
+    System::Command: 12834 - git = /usr/bin/git
 
-Note: the C<git> option in the example above is actually used by
-L<Git::Repository> to determine the command to be run, and ignored by
-System::Command.
+Note: The C<fatal> and C<git> options in the example above is actually
+used by L<Git::Repository> to determine the command to be run, and
+ignored by System::Command. References are dumped using L<Data::Dumper>.
 
-At trace level 3, the content of the C<env> option are also listed:
+At trace level 3, the content of the C<env> option is also listed:
 
     System::Command: 12834 - $ENV{GIT_AUTHOR_EMAIL} = author@example.com
     System::Command: 12834 - $ENV{GIT_AUTHOR_NAME} = Example author
