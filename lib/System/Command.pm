@@ -218,7 +218,7 @@ sub new {
 
     # FIXME - better check error conditions
     if ( !defined $pid ) {
-        print $th "System::Command: ! - @cmd\n";
+        print $th "System::Command: ! - @cmd\n" if $trace;
         croak $@;
     }
 
