@@ -173,6 +173,20 @@ my $_dump_ref = sub {
     return Data::Dumper->Dump( [shift] );
 };
 
+my $_do_trace = sub {
+    my ( $trace, $th, $pid, $cmd, $o ) = @_;
+    print $th "System::Command: $pid - ",
+        join( ' ', map /\s/ ? $_dump_ref->($_) : $_, @$cmd ), "\n";
+    print $th map "System::Command: $pid - $_->[0] = $_->[1]\n",
+        map [ $_ => $_dump_ref->( $o->{$_} ) ],
+        grep { $_ ne 'env' } sort keys %$o
+        if $trace > 1;
+    print $th map "System::Command: $pid - $_->[0] = $_->[1]\n",
+        map [ "\$ENV{$_}" => $_dump_ref->( $o->{env}{$_} ) ],
+        keys %{ $o->{env} || {} }
+        if $trace > 2;
+};
+
 # module methods
 sub new {
     my ( $class, @cmd ) = @_;
@@ -218,23 +232,12 @@ sub new {
 
     # FIXME - better check error conditions
     if ( !defined $pid ) {
-        print $th "System::Command: ! - @cmd\n" if $trace;
+        $_do_trace->( $trace, $th, '!', \@cmd, $o ) if $trace;
         croak $@;
     }
 
     # trace is mostly a debugging tool
-    if ($trace) {
-        print $th "System::Command: $pid - ",
-            join( ' ', map /\s/ ? $_dump_ref->($_) : $_, @cmd ), "\n";
-        print $th map "System::Command: $pid - $_->[0] = $_->[1]\n",
-            map [ $_ => $_dump_ref->( $o->{$_} ) ],
-            grep { $_ ne 'env' } sort keys %$o
-            if $trace > 1;
-        print $th map "System::Command: $pid - $_->[0] = $_->[1]\n",
-            map [ "\$ENV{$_}" => $_dump_ref->( $o->{env}{$_} ) ],
-            keys %{ $o->{env} || {} }
-            if $trace > 2;
-    }
+    $_do_trace->( $trace, $th, $pid, \@cmd, $o ) if $trace;
 
     # some input was provided
     if ( defined $o->{input} ) {
