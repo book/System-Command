@@ -41,11 +41,14 @@ sub is_terminated {
 }
 
 sub _reap {
-    my ( $self, @flags ) = @_;
+    my ( $self, $flags ) = @_;
+
+    $flags = 0 if ! defined $flags;
+
     my $pid = $self->{pid};
 
     # REPENT/THE END IS/EXTREMELY/FUCKING/NIGH
-    if ( my $reaped = waitpid( $pid, @flags ) and !exists $self->{exit} ) {
+    if ( my $reaped = waitpid( $pid, $flags ) and !exists $self->{exit} ) {
         my $zed = $reaped == $pid;
         carp "Child process already reaped, check for a SIGCHLD handler"
             if !$zed && !$System::Command::QUIET && !MSWin32;
