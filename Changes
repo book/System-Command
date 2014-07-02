@@ -2,6 +2,13 @@ Revision history for System-Command
 
 {{$NEXT}}
 
+1.109 Wed Jul 2 2014
+        [BUG FIX]
+        - fix the test failures on Solaris, thanks to Wolfgang Pecho
+          (RT #82857). The reaper code was actually buggy (since v1.03!)
+          and only accidentally worked on platforms where WNOHANG == 1
+          (which was most of them)
+
 1.108 Wed Feb 26 2014
         [ENHANCEMENTS]
         - the trace option makes it possible to see exactly which commands
