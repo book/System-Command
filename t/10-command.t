@@ -78,6 +78,9 @@ my @tests = (
             input => ''
             }
     },
+    {   cmdline => [ $^X, $name, { env => { 'TO_BE_DELETED' => '' } } ],
+        options => { env => { 'TO_BE_DELETED' => '' } }
+    },
 );
 my @fail = (
     {   cmdline =>
