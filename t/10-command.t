@@ -133,6 +133,7 @@ for my $t ( @tests, @fail ) {
     delete $env->{$_}
         for grep { !defined $t->{options}{env}{$_} }
         keys %{ $t->{options}{env} || {} };
+    delete $env->{$_} for grep /^CONEMU/, keys %ENV;
     my $info;
     eval $output;
     my $w32env = {};
