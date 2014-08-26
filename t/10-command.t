@@ -123,6 +123,9 @@ for my $t ( @tests, @fail ) {
         }
     }
 
+    # default option: setpgrp
+    $t->{options}{setpgrp} = 1
+        if !exists $t->{options}{setpgrp};
     is_deeply( [ $cmd->cmdline ],
         [ grep { !ref } @{ $t->{cmdline} } ], 'cmdline' );
     is_deeply( $cmd->options, $t->{options}, 'options' );

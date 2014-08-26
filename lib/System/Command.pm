@@ -56,7 +56,7 @@ for my $attr (qw( cmdline )) {
 # REALLY PRIVATE FUNCTIONS
 # a sub-process spawning function
 my $_spawn = sub {
-    my (@cmd) = @_;
+    my ($o, @cmd) = @_;
     my $pid;
 
     # setup filehandles
@@ -125,7 +125,7 @@ my $_spawn = sub {
                 close $err;
 
                 # setup process group if possible
-                setpgrp 0, 0 if $Config{d_setpgrp};
+                setpgrp 0, 0 if $o->{setpgrp} && $Config{d_setpgrp};
 
                 # close $stat_w on exec
                 my $flags = fcntl( $stat_w, F_GETFD, 0 )
@@ -192,7 +192,7 @@ sub new {
     my ( $class, @cmd ) = @_;
 
     # split the args
-    my @o;
+    my @o = { setpgrp => 1 };
     @cmd = grep { !( ref eq 'HASH' ? push @o, $_ : 0 ) } @cmd;
 
     # merge the option hashes
@@ -228,7 +228,7 @@ sub new {
     }
 
     # start the command
-    my ( $pid, $in, $out, $err ) = eval { $_spawn->(@cmd); };
+    my ( $pid, $in, $out, $err ) = eval { $_spawn->( $o, @cmd ); };
 
     # FIXME - better check error conditions
     if ( !defined $pid ) {
@@ -375,6 +375,17 @@ a way to modify previous options populated by some other part of the program.
 On some systems, some commands may close standard input on startup,
 which will cause a SIGPIPE when trying to write to it. This will raise
 an exception.
+
+=item C<setpgrp>
+
+By default, the spawned process is made the leader of its own process
+group using C<setpgrp( 0, 0 )> (if possible). This enables sending a
+signal to the command and all its child processes at once:
+
+    # negative signal is sent to the process group
+    kill -SIGKILL, $cmd->pid;
+
+Setting the C<setpgrp> option to a false value disables this behaviour.
 
 =item C<trace>
 
