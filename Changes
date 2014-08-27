@@ -2,6 +2,13 @@ Revision history for System-Command
 
 {{$NEXT}}
 
+1.110 Wed Aug 27 2014
+    [ENHANCEMENTS]
+    - the 'setpgrp' option can be used to enable/disable the call to
+      setpgrp() in the spawned process
+    [TESTS]
+    - t/10-command.t now ignores environment variables set by ConEmu
+
 1.109 Wed Jul 2 2014
     [BUG FIX]
     - fix the test failures on Solaris, thanks to Wolfgang Pecho
@@ -11,7 +18,7 @@ Revision history for System-Command
 
 1.108 Wed Feb 26 2014
     [ENHANCEMENTS]
-    - the trace option makes it possible to see exactly which commands
+    - the 'trace' option makes it possible to see exactly which commands
       were spawned, with their options (including environment)
     [DOCUMENTATION]
     - style fixes
