@@ -424,7 +424,7 @@ At trace level 3, the content of the C<env> option is also listed:
 If the command cannot be spawned, the trace will show C<!> instead of
 the pid:
 
-    System::Command: ! - does-not-exist
+    System::Command cmd[!]: does-not-exist
 
 =back
 
