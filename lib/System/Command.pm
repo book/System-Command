@@ -412,7 +412,7 @@ At trace level 2, the options values are shown:
     System::Command opt[12834]: fatal => {128 => 1,129 => 1}
     System::Command opt[12834]: git => "/usr/bin/git"
 
-Note: The C<fatal> and C<git> options in the example above is actually
+Note: The C<fatal> and C<git> options in the example above are actually
 used by L<Git::Repository> to determine the command to be run, and
 ignored by System::Command. References are dumped using L<Data::Dumper>.
 
