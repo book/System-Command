@@ -1,6 +1,8 @@
 Revision history for System-Command
 
 {{$NEXT}}
+    [ENHANCEMENTS]
+    - throw an error on empty string env variables on Win32
 
 1.110 Wed Aug 27 2014
     [ENHANCEMENTS]

@@ -79,7 +79,10 @@ my @tests = (
             }
     },
     {   cmdline => [ $^X, $name, { env => { 'TO_BE_DELETED' => '' } } ],
-        options => { env => { 'TO_BE_DELETED' => '' } }
+        options => { env => { 'TO_BE_DELETED' => '' } },
+        skip_reason => "this test makes no sense on Win32",
+        skip_check => sub { MSWin32 },
+        skip_count => 14,
     },
 );
 my @fail = (
@@ -88,6 +91,12 @@ my @fail = (
         cwd     => File::Spec->catdir( $dir, 'nothere' ),
         fail    => qr/^Can't chdir to /,
         options => {},
+    },
+    {   cmdline => [ $^X, $name, { env => { 'TO_BE_DELETED' => '' } } ],
+        fail    => qr/^ENV variables cannot be empty strings on Win32 /,
+        skip_reason => "this test only makes sense on Win32",
+        skip_check => sub { !MSWin32 },
+        skip_count => 2,
     },
 );
 
@@ -98,7 +107,9 @@ if ( $Config{sig_name} !~ /\bPIPE\b/ ) {
    diag $Config{sig_name};
 }
 
-for my $t ( @tests, @fail ) {
+for my $t ( @tests, @fail ) {SKIP:{
+    skip $t->{skip_reason}, $t->{skip_count}
+        if ($t->{skip_check}||sub{})->();
 
     # run the command
     my $cmd = eval { System::Command->new( @{ $t->{cmdline} } ) };
@@ -162,5 +173,5 @@ for my $t ( @tests, @fail ) {
     is( $cmd->exit,   0, 'exit 0' );
     is( $cmd->signal, 0, 'no signal received' );
     is( $cmd->core, $t->{core} || 0, 'no core dumped' );
-}
+}}
 
