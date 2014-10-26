@@ -222,6 +222,8 @@ sub new {
 
     # update the environment
     if ( exists $o->{env} ) {
+        croak "ENV variables cannot be empty strings on Win32"
+            if MSWin32 and grep { defined and !length } values %{ $o->{env} };
         @ENV{ keys %{ $o->{env} } } = values %{ $o->{env} };
         delete $ENV{$_}
             for grep { !defined $o->{env}{$_} } keys %{ $o->{env} };
