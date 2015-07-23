@@ -14,8 +14,9 @@ use constant HANDLES => qw( stdin stdout stderr );
 use constant STATUS  => qw( exit signal core );
 
 sub new {
-    my ($class, $command) = @_;
-    my $self = bless { command => $command }, $class;
+    my ($class, $command, $o) = @_;
+    $o ||= {};
+    my $self = bless { %$o, command => $command }, $class;
 
     # copy/weaken the important keys
     @{$self}{ pid => HANDLES } = @{$command}{ pid => HANDLES };
@@ -142,10 +143,12 @@ System::Command::Reaper supports the following methods:
 
 =head2 new
 
-    my $reaper = System::Command::Reaper->new( $cmd );
+    my $reaper = System::Command::Reaper->new( $cmd, \%extra );
 
 Create a new System::Command::Reaper object attached to the
 L<System::Command> object passed as a parameter.
+
+An optional hash reference can be used to pass extra attributes to the object.
 
 =head2 close
 
