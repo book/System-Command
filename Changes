@@ -5,6 +5,7 @@ Revision history for System-Command
 1.111 Sat Feb 14 2015
     [ENHANCEMENTS]
     - throw an error on empty string env variables on Win32 (MITHALDU)
+      (RT #99824)
     [DOCUMENTATION]
     - minor documentation improvements
     - added the list of contributors to the META file
