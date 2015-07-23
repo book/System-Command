@@ -268,7 +268,7 @@ sub new {
 
     # create the subprocess reaper and link the handles and command to it
     ${*$in} = ${*$out} = ${*$err} = $self->{reaper}    # typeglobs FTW
-        = System::Command::Reaper->new($self);
+      = System::Command::Reaper->new( $self, { trace => $trace, th => $th } );
 
     return $self;
 }

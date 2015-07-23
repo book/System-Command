@@ -64,6 +64,11 @@ sub _reap {
         @{ $self->{command} }{ STATUS() } = @{$self}{ STATUS() }
             if defined $self->{command};
 
+        # I think it's safe to assume it isn't a zombie.
+        print { $self->{th} } "System::Command xit[$pid]: ",
+          join( ', ', map "$_: $self->{$_}", STATUS() ), "\n"
+          if $self->{trace};
+
         return $reaped;    # It's dead, Jim!
     }
 
