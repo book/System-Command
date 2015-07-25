@@ -2,6 +2,11 @@ Revision history for System-Command
 
 {{$NEXT}}
 
+1.112 Sat Jul 25 2015
+    [ENHANCEMENTS]
+    - the 'trace' option now also outputs some information about process
+      termination and status (as requested by TIMB in RT #106046)
+
 1.111 Sat Feb 14 2015
     [ENHANCEMENTS]
     - throw an error on empty string env variables on Win32 (MITHALDU)
