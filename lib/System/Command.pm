@@ -44,13 +44,14 @@ sub import {
 }
 
 # a few simple accessors
-for my $attr (qw( pid stdin stdout stderr exit signal core options )) {
+{
     no strict 'refs';
-    *$attr = sub { return $_[0]{$attr} };
-}
-for my $attr (qw( cmdline )) {
-    no strict 'refs';
-    *$attr = sub { return @{ $_[0]{$attr} } };
+    for my $attr (qw( pid stdin stdout stderr exit signal core options )) {
+        *$attr = sub { return $_[0]{$attr} };
+    }
+    for my $attr (qw( cmdline )) {
+        *$attr = sub { return @{ $_[0]{$attr} } };
+    }
 }
 
 # REALLY PRIVATE FUNCTIONS
