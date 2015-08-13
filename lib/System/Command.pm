@@ -473,27 +473,27 @@ The object returned by C<new()> will have the following attributes defined:
 
 =over 4
 
-=item cmdline()
+=item cmdline
 
 Return the command-line actually executed, as a list of strings.
 
-=item options()
+=item options
 
 The merged list of options used to run the command.
 
-=item pid()
+=item pid
 
 The PID of the underlying command.
 
-=item stdin()
+=item stdin
 
 A filehandle opened in write mode to the child process' standard input.
 
-=item stdout()
+=item stdout
 
 A filehandle opened in read mode to the child process' standard output.
 
-=item stderr()
+=item stderr
 
 A filehandle opened in read mode to the child process' standard error output.
 
@@ -513,15 +513,15 @@ the following attributes will be defined:
 
 =over 4
 
-=item exit()
+=item exit
 
 The exit status of the underlying command.
 
-=item core()
+=item core
 
 A boolean value indicating if the command dumped core.
 
-=item signal()
+=item signal
 
 The signal, if any, that killed the command.
 
