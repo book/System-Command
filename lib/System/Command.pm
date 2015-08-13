@@ -441,6 +441,9 @@ attributes defined (see below).
 Close all pipes to the child process, collects exit status, etc.
 and defines a number of attributes (see below).
 
+Returns the L<System::Command::Reaper> object that collected the
+termination information.
+
 =head2 is_terminated
 
     if ( $cmd->is_terminated ) {...}
