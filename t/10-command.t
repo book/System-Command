@@ -100,7 +100,7 @@ my @fail = (
     },
 );
 
-plan tests => 14 * @tests + 2 * @fail;
+plan tests => 17 * @tests + 2 * @fail;
 
 if ( $Config{sig_name} !~ /\bPIPE\b/ ) {
    diag "No SIGPIPE signal on this Perl. Available signals:";
@@ -169,9 +169,12 @@ for my $t ( @tests, @fail ) {SKIP:{
     );
 
     # close and check
-    $cmd->close();
-    is( $cmd->exit,   0, 'exit 0' );
-    is( $cmd->signal, 0, 'no signal received' );
-    is( $cmd->core, $t->{core} || 0, 'no core dumped' );
+    my $reaper = $cmd->close();
+    my @things = ( cmd => $cmd, reaper => $reaper );
+    while ( my ( $desc, $thing ) = splice @things, 0, 2 ) {
+        is( $thing->exit,   0, "exit 0 ($desc)" );
+        is( $thing->signal, 0, "no signal received ($desc)" );
+        is( $thing->core, $t->{core} || 0, "no core dumped ($desc)" );
+    }
 }}
 
