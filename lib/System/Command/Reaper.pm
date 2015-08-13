@@ -178,6 +178,53 @@ Returns a true value if the underlying process was terminated.
 
 If the process was indeed terminated, collects exit status, etc.
 
+=head2 Accessors
+
+The attributes of a System::Command::Reaper object are also accessible
+through a number of accessors.
+
+The object returned by C<new()> will have the following attributes defined
+(as copied from the L<System::Command> object that created the reaper):
+
+=over 4
+
+=item pid
+
+The PID of the underlying command.
+
+=item stdin
+
+A filehandle opened in write mode to the child process' standard input.
+
+=item stdout
+
+A filehandle opened in read mode to the child process' standard output.
+
+=item stderr
+
+A filehandle opened in read mode to the child process' standard error output.
+
+=back
+
+After the call to C<close()> or after C<is_terminated()> returns true,
+the following attributes will be defined:
+
+=over 4
+
+=item exit
+
+The exit status of the underlying command.
+
+=item core
+
+A boolean value indicating if the command dumped core.
+
+=item signal
+
+The signal, if any, that killed the command.
+
+=back
+
 =head1 AUTHOR
 
 Philippe Bruhat (BooK), C<< <book at cpan.org> >>
