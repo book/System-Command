@@ -230,6 +230,28 @@ sub new {
             for grep { !defined $o->{env}{$_} } keys %{ $o->{env} };
     }
 
+    # interactive mode requested
+    if ( $o->{interactive} ) {
+        croak "Can't run command in interactive mode: not a terminal"
+          unless -t STDIN;
+
+        system { $cmd[0] } @cmd;
+
+        my $self = bless {
+            cmdline => [@cmd],
+            options => $o,
+            stdin   => IO::Handle->new,
+            stdout  => IO::Handle->new,
+            stderr  => IO::Handle->new,
+            exit    => $? >> 8,
+            signal  => $? & 127,
+            core    => $? & 128,
+        }, $class;
+        $self->{reaper} =
+          System::Command::Reaper->new( $self, { trace => $trace, th => $th } ),
+        return $self;
+    }
+
     # start the command
     my ( $pid, $in, $out, $err ) = eval { $_spawn->( $o, @cmd ); };
 
