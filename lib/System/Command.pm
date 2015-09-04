@@ -281,7 +281,7 @@ sub spawn {
 
 # delegate those to the reaper
 sub is_terminated { $_[0]{reaper}->is_terminated() }
-sub close         { $_[0]{reaper}->close() }
+sub close         { $_[0]{reaper}->close(); return $_[0]; }
 
 1;
 
@@ -442,8 +442,9 @@ attributes defined (see below).
 Close all pipes to the child process, collects exit status, etc.
 and defines a number of attributes (see below).
 
-Returns the L<System::Command::Reaper> object that collected the
-termination information.
+Returns the invocant, so one can do things like:
+
+    my $exit = $cmd->close->exit;
 
 =head2 is_terminated
 
