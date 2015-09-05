@@ -2,6 +2,16 @@ Revision history for System-Command
 
 {{$NEXT}}
 
+1.113 Sun Sep 6 2015
+    [ENHANCEMENTS]
+    - add proper accessors for the following System::Command::Reaper
+      attributes: sdtin, stdout, stderr, exit, signal, core
+      (after discussion with TIMB in RT #106330)
+    - System::Command::close() now returns the object itself (RT #106867)
+    [DOCUMENTATION]
+    - document the return value of close() can be used to access the
+      value of exit, signal and core
+
 1.112 Sat Jul 25 2015
     [ENHANCEMENTS]
     - the 'trace' option now also outputs some information about process
