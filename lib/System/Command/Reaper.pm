@@ -105,7 +105,11 @@ sub DESTROY {
 
 __END__
 
-# ABSTRACT: Reap processes started by System::Command
+=pod
+
+=head1 NAME
+
+System::Command::Reaper - Reap processes started by System::Command
 
 =head1 SYNOPSIS
 

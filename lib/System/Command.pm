@@ -286,7 +286,11 @@ sub close         { $_[0]{reaper}->close() }
 
 __END__
 
-# ABSTRACT: Object for running system commands
+=pod
+
+=head1 NAME
+
+System::Command - Object for running system commands
 
 =head1 SYNOPSIS
 
