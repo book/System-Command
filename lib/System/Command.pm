@@ -46,8 +46,12 @@ sub import {
 # a few simple accessors
 {
     no strict 'refs';
-    for my $attr (qw( pid stdin stdout stderr exit signal core options )) {
+    for my $attr (qw( pid stdin stdout stderr options )) {
         *$attr = sub { return $_[0]{$attr} };
+    }
+    for my $attr (qw( exit signal core )) {
+        no strict 'refs';
+        *$attr = sub { $_[0]->is_terminated(); return $_[0]{$attr} };
     }
     for my $attr (qw( cmdline )) {
         *$attr = sub { return @{ $_[0]{$attr} } };
@@ -515,7 +519,9 @@ C<$fh> is destroyed, the subprocess will be reaped, thus avoiding zombies.
 (L<System::Command::Reaper> undertakes this process.)
 
 After the call to C<close()> or after C<is_terminated()> returns true,
-the following attributes will be defined:
+the following attributes will be defined (note that the accessors
+always run C<is_terminated()>, to improve their chance of getting
+a value if the process just finished):
 
 =over 4
 

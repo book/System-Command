@@ -13,9 +13,13 @@ use constant MSWin32 => $^O eq 'MSWin32';
 use constant HANDLES => qw( stdin stdout stderr );
 use constant STATUS  => qw( exit signal core );
 
-for my $attr ( HANDLES, STATUS ) {
+for my $attr ( HANDLES ) {
     no strict 'refs';
     *$attr = sub { return $_[0]{$attr} };
+}
+for my $attr ( STATUS ) {
+    no strict 'refs';
+    *$attr = sub { $_[0]->is_terminated(); return $_[0]{$attr} };
 }
 
 sub new {
