@@ -21,7 +21,6 @@ for my $attr ( HANDLES, STATUS ) {
 sub new {
     my ($class, $command, $o) = @_;
     $o ||= {};
-    $o->{interactive} = $command->options->{interactive};
     my $self = bless { %$o, command => $command }, $class;
 
     # copy/weaken the important keys
@@ -49,7 +48,6 @@ sub is_terminated {
 
 sub _reap {
     my ( $self, $flags ) = @_;
-    return if $self->{interactive};
 
     $flags = 0 if ! defined $flags;
 

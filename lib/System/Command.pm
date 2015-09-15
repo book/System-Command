@@ -237,7 +237,7 @@ sub new {
 
         system { $cmd[0] } @cmd;
 
-        my $self = bless {
+        return bless {
             cmdline => [@cmd],
             options => $o,
             stdin   => IO::Handle->new,
@@ -247,9 +247,6 @@ sub new {
             signal  => $? & 127,
             core    => $? & 128,
         }, $class;
-        $self->{reaper} =
-          System::Command::Reaper->new( $self, { trace => $trace, th => $th } ),
-        return $self;
     }
 
     # start the command
@@ -301,9 +298,17 @@ sub spawn {
     return @{ $class->new(@cmd) }{qw( pid stdin stdout stderr )};
 }
 
-# delegate those to the reaper
-sub is_terminated { $_[0]{reaper}->is_terminated() }
-sub close         { $_[0]{reaper}->close(); return $_[0]; }
+# delegate those to the reaper (when there's one)
+sub is_terminated {
+    return $_[0]{options}{interactive}
+      ? 1
+      : $_[0]{reaper}->is_terminated();
+}
+
+sub close {
+    $_[0]{reaper}->close() unless $_[0]{options}{interactive};
+    return $_[0];
+}
 
 1;
 
