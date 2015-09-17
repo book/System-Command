@@ -2,6 +2,16 @@ Revision history for System-Command
 
 {{$NEXT}}
 
+1.114 Fri Sep 18 2015
+    [ENHANCEMENTS]
+    - added proper accessors for the following System::Command::Reaper
+      attributes: sdtin, stdout, stderr, exit, signal, core
+      (after discussion with TIMB in RT #106330)
+    - added 'exit', 'signal', 'core' options to System::Command, to allow
+      direct update of variables at reaping time
+    - added the 'interactive' option, to make it possible to run interactive
+      commands directly with system (after discussion with TIMB in RT #106330)
+
 1.113 Sun Sep 6 2015
     [ENHANCEMENTS]
     - add proper accessors for the following System::Command::Reaper
