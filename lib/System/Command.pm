@@ -437,6 +437,17 @@ the pid:
 
     System::Command cmd[!]: does-not-exist
 
+=item exit
+
+=item core
+
+=item signal
+
+The above three options can be set to point to a reference to a scalar,
+which will be automatically updated when the command is terminated. See
+the L</Accessors> section for details about what the attributes of the
+same name mean.
+
 =back
 
 The System::Command object returned by C<new()> has a number of
@@ -538,6 +549,15 @@ A boolean value indicating if the command dumped core.
 The signal, if any, that killed the command.
 
 =back
+
+Even when not having a reference to the System::Command object any more,
+it's still possible to get the C<exit>, C<core> or C<signal> values,
+using the options of the same name:
+
+    my $fh = System::Command->new( @cmd, { exit => \my $exit } )->stdout;
+
+Once the command is terminated, the C<$exit> variable will contain the
+value that would have been returned by the C<exit()> method.
 
 =head1 CAVEAT EMPTOR
 
