@@ -5,7 +5,7 @@ use warnings;
 use 5.006;
 
 use Carp;
-use Scalar::Util qw( weaken );
+use Scalar::Util qw( weaken reftype );
 
 use POSIX ":sys_wait_h";
 
@@ -59,6 +59,8 @@ sub _reap {
 
     # REPENT/THE END IS/EXTREMELY/FUCKING/NIGH
     if ( my $reaped = waitpid( $pid, $flags ) and !exists $self->{exit} ) {
+
+        # Well, it's a puzzle because, technically, you're not alive.
         my $zed = $reaped == $pid;
         carp "Child process already reaped, check for a SIGCHLD handler"
             if !$zed && !$System::Command::QUIET && !MSWin32;
@@ -70,8 +72,16 @@ sub _reap {
             : ( -1, -1, -1 );
 
         # Who died and made you fucking king of the zombies?
-        @{ $self->{command} }{ STATUS() } = @{$self}{ STATUS() }
-            if defined $self->{command};
+        if ( defined( my $cmd = $self->{command} ) ) {
+            @{$cmd}{ STATUS() } = @{$self}{ STATUS() };
+
+            # I know you're here, because I can smell your brains.
+            my $o = $cmd->{options};
+            defined reftype( $o->{$_} )
+              and reftype( $o->{$_} ) eq 'SCALAR'
+              and ${ $o->{$_} } = $self->{$_}
+              for STATUS();
+        }
 
         # I think it's safe to assume it isn't a zombie.
         print { $self->{th} } "System::Command xit[$pid]: ",
