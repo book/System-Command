@@ -653,6 +653,7 @@ The L<System::Command::Reaper> class was added after the addition
 of Git::Repository::Command::Reaper in L<Git::Repository::Command> 1.11.
 It was later removed from L<System::Command> version 1.03, and brought
 back from the dead to deal with the zombie apocalypse in version 1.106.
+The idea of a reaper class comes from Vincent Pit.
 
 Thanks to Tim Bunce for using L<Git::Repository> and making many
 suggestions based on his use and needs. Most of them turned into
