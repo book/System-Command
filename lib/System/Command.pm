@@ -654,6 +654,11 @@ of Git::Repository::Command::Reaper in L<Git::Repository::Command> 1.11.
 It was later removed from L<System::Command> version 1.03, and brought
 back from the dead to deal with the zombie apocalypse in version 1.106.
 
+Thanks to Tim Bunce for using L<Git::Repository> and making many
+suggestions based on his use and needs. Most of them turned into
+improvement for System::Command instead, once we figured out that the
+more general feature idea really belonged there.
+
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-system-command at rt.cpan.org>, or through
