@@ -241,7 +241,7 @@ sub new {
 
         system { $cmd[0] } @cmd;
 
-        return bless {
+        my $self = bless {
             cmdline => [@cmd],
             options => $o,
             stdin   => IO::Handle->new,
@@ -251,6 +251,13 @@ sub new {
             signal  => $? & 127,
             core    => $? & 128,
         }, $class;
+
+        defined reftype( $o->{$_} )
+          and reftype( $o->{$_} ) eq 'SCALAR'
+          and ${ $o->{$_} } = $self->{$_}
+          for qw( exit signal core );
+
+        return $self;
     }
 
     # start the command
