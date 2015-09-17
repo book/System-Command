@@ -234,6 +234,25 @@ sub new {
             for grep { !defined $o->{env}{$_} } keys %{ $o->{env} };
     }
 
+    # interactive mode requested
+    if ( $o->{interactive} ) {
+        croak "Can't run command in interactive mode: not a terminal"
+          unless -t STDIN;
+
+        system { $cmd[0] } @cmd;
+
+        return bless {
+            cmdline => [@cmd],
+            options => $o,
+            stdin   => IO::Handle->new,
+            stdout  => IO::Handle->new,
+            stderr  => IO::Handle->new,
+            exit    => $? >> 8,
+            signal  => $? & 127,
+            core    => $? & 128,
+        }, $class;
+    }
+
     # start the command
     my ( $pid, $in, $out, $err ) = eval { $_spawn->( $o, @cmd ); };
 
@@ -283,9 +302,17 @@ sub spawn {
     return @{ $class->new(@cmd) }{qw( pid stdin stdout stderr )};
 }
 
-# delegate those to the reaper
-sub is_terminated { $_[0]{reaper}->is_terminated() }
-sub close         { $_[0]{reaper}->close(); return $_[0]; }
+# delegate those to the reaper (when there's one)
+sub is_terminated {
+    return $_[0]{options}{interactive}
+      ? 1
+      : $_[0]{reaper}->is_terminated();
+}
+
+sub close {
+    $_[0]{reaper}->close() unless $_[0]{options}{interactive};
+    return $_[0];
+}
 
 1;
 
@@ -386,6 +413,15 @@ a way to modify previous options populated by some other part of the program.
 On some systems, some commands may close standard input on startup,
 which will cause a SIGPIPE when trying to write to it. This will raise
 an exception.
+
+=item C<interactive>
+
+If true, the command will actually be run using the L<perlfunc/system>
+builtin. If C<STDIN> is not a terminal, the constructor will die.
+
+Not reaper object will be created, and the C<stdin>, C<stdout> and
+C<stderr> filehandles will point to dummy closed handles. The C<exit>,
+C<signal> and C<core> attributes will be correctly set.
 
 =item C<setpgrp>
 
