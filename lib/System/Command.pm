@@ -410,6 +410,15 @@ On some systems, some commands may close standard input on startup,
 which will cause a SIGPIPE when trying to write to it. This will raise
 an exception.
 
+=item C<interactive>
+
+If true, the command will actually be run using the L<perlfunc/system>
+builtin. If C<STDIN> is not a terminal, the constructor will die.
+
+Not reaper object will be created, and the C<stdin>, C<stdout> and
+C<stderr> filehandles will point to dummy closed handles. The C<exit>,
+C<signal> and C<core> attributes will be correctly set.
+
 =item C<setpgrp>
 
 By default, the spawned process is made the leader of its own process
