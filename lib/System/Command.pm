@@ -540,13 +540,13 @@ a value if the process just finished):
 
 The exit status of the underlying command.
 
-=item core
-
-A boolean value indicating if the command dumped core.
-
 =item signal
 
 The signal, if any, that killed the command.
+
+=item core
+
+A boolean value indicating if the command dumped core.
 
 =back
 
@@ -567,8 +567,8 @@ code (or any module you C<use>) does something like the following:
 
     local $SIG{CHLD} = 'IGNORE';    # reap child processes
 
-System::Command will not be able to capture the C<exit>, C<core>
-and C<signal> attributes. It will instead set all of them to the
+System::Command will not be able to capture the C<exit>, C<signal>
+and C<core> attributes. It will instead set all of them to the
 impossible value C<-1>, and display the warning
 C<Child process already reaped, check for a SIGCHLD handler>.
 
