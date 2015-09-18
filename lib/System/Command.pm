@@ -430,6 +430,8 @@ Not reaper object will be created, and the C<stdin>, C<stdout> and
 C<stderr> filehandles will point to dummy closed handles. The C<exit>,
 C<signal> and C<core> attributes will be correctly set.
 
+(Added in version 1.114.)
+
 =item C<setpgrp>
 
 By default, the spawned process is made the leader of its own process
@@ -440,6 +442,8 @@ signal to the command and all its child processes at once:
     kill -SIGKILL, $cmd->pid;
 
 Setting the C<setpgrp> option to a false value disables this behaviour.
+
+(Added in version 1.110.)
 
 =item C<trace>
 
@@ -480,6 +484,8 @@ the pid:
 
     System::Command cmd[!]: does-not-exist
 
+(Added in version 1.108.)
+
 =item exit
 
 =item core
@@ -490,6 +496,8 @@ The above three options can be set to point to a reference to a scalar,
 which will be automatically updated when the command is terminated. See
 the L</Accessors> section for details about what the attributes of the
 same name mean.
+
+(Added in version 1.114.)
 
 =back
 
@@ -527,6 +535,7 @@ This shortcut method calls C<new()> (and so accepts options in the same
 manner) and directly returns the C<pid>, C<stdin>, C<stdout> and C<stderr>
 attributes, in that order.
 
+(Added in version 1.01.)
 
 =head2 Accessors
 
