@@ -12,6 +12,7 @@ $ENV{TO_BE_DELETED} = 'LATER';
 my $dir   = abs_path( tempdir( CLEANUP => 1 ) );
 my $cwd   = cwd;
 my $name  = File::Spec->catfile( t => 'info.pl' );
+my $tests_per_test = 17;
 my @tests = (
     {   cmdline => [ $^X, $name ],
         options => {},
@@ -82,7 +83,7 @@ my @tests = (
         options => { env => { 'TO_BE_DELETED' => '' } },
         skip_reason => "this test makes no sense on Win32",
         skip_check => sub { MSWin32 },
-        skip_count => 14,
+        skip_count => $tests_per_test,
     },
 );
 my @fail = (
@@ -100,7 +101,7 @@ my @fail = (
     },
 );
 
-plan tests => 17 * @tests + 2 * @fail;
+plan tests => $tests_per_test * @tests + 2 * @fail;
 
 if ( $Config{sig_name} !~ /\bPIPE\b/ ) {
    diag "No SIGPIPE signal on this Perl. Available signals:";
