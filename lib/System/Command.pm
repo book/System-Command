@@ -100,7 +100,7 @@ my $_spawn = sub {
         pipe $err, $ERR or croak "errput pipe(): $!";
 
         # an extra pipe to communicate exec() failure
-        pipe my $stat_r, my $stat_w;
+        pipe my ( $stat_r, $stat_w );
 
         # create the child process
         $pid = fork;
