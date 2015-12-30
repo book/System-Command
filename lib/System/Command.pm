@@ -8,7 +8,7 @@ use Carp;
 use Cwd qw( cwd );
 use IO::Handle;
 use Symbol ();
-use Scalar::Util qw( blessed );
+use Scalar::Util qw( blessed reftype );
 use List::Util qw( reduce );
 use System::Command::Reaper;
 
