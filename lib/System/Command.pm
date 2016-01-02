@@ -321,6 +321,17 @@ sub close {
     return $_[0];
 }
 
+sub success {
+  my $self = shift;
+
+  # Make sure the command is finished.
+  while (!defined $self->is_terminated) {
+    select(undef, undef, undef, 0.1)
+  }
+  return $self->exit == 0;
+}
+sub failure { !shift->success }
+
 1;
 
 __END__
@@ -526,6 +537,27 @@ If the process was indeed terminated, collects exit status, etc.
 and defines the same attributes as C<close()>, but does B<not> close
 all pipes to the child process.
 
+=head2 success
+
+    if ( $cmd->success ) {...}
+
+Returns a true value if the underlying process was completed successfully.
+
+This necessarily waits until C<is_terminated()> returns true. It will wait by doing
+a 100ms select, then checking to see if the command has terminated. If your command
+never terminates, this method will never return.
+
+=head2 failure
+
+    if ( $cmd->failure ) {...}
+
+Returns a true value if the underlying process was completed UN-successfully.
+
+This is implemented under the hood as:
+
+    return !$self->success
+
+Please read that function's description for important caveats.
 
 =head2 spawn
 
