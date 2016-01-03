@@ -2,6 +2,12 @@ Revision history for System-Command
 
 {{$NEXT}}
 
+1.116 Sun Jan 3 2016
+    [BUG FIX]
+    - Fix for the 'interactive' option (RKINYON)
+    [COMPATIBILITY]
+    - Remove a warning that was showing up under Perl 5.6
+
 1.115 Mon Sep 28 2015
     [BUG FIX]
     - ensure test counts and skip counts remain tied together (MITHALDU)
