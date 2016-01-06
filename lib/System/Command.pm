@@ -309,6 +309,41 @@ sub spawn {
     return @{ $class->new(@cmd) }{qw( pid stdin stdout stderr )};
 }
 
+sub loop_on {
+    my ( $self, %args ) = @_;
+
+    # create an object for the class method
+    if ( !ref $self ) {
+        die "'command' attribute required by loop_on when used as a class method"
+          if !exists $args{command};
+        $self = $self->new( @{ $args{command} } );
+    }
+
+    require IO::Select;
+    my $select = IO::Select->new( $self->stdout, $self->stderr );
+
+    local $/ = $args{input_record_separator}
+      if exists $args{input_record_separator};
+
+    # loop until end of streams
+    while ( my @ready = $select->can_read ) {
+        for my $fh (@ready) {
+            my $which = $fh == $self->stdout ? 'stdout' : 'stderr';
+            if ( defined( my $line = <$fh> ) ) {
+                $args{$which}->($line)
+                  if exists $args{$which};
+            }
+            else {
+                $select->remove($fh);
+                $fh->close;
+            }
+        }
+    }
+
+    # success in the Unix sense
+    return $self->exit == 0;
+}
+
 # delegate those to the reaper (when there's one)
 sub is_terminated {
     return $_[0]{options}{interactive}
