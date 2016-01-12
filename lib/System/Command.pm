@@ -310,8 +310,13 @@ sub spawn {
 }
 
 sub loop_on {
+    my $self = shift;
 
-    # validate options
+    # handle options and defaults
+    my %args = (
+        stderr => sub { print STDERR shift },
+        @_
+    );
     for my $which ( grep exists $args{$_}, qw( stdout stderr ) ) {
         if ( $args{$which} ) {
             croak "'$which' option must be a CODE reference"
