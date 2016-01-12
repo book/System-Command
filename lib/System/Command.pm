@@ -310,7 +310,14 @@ sub spawn {
 }
 
 sub loop_on {
-    my ( $self, %args ) = @_;
+
+    # validate options
+    for my $which ( grep exists $args{$_}, qw( stdout stderr ) ) {
+        if ( $args{$which} ) {
+            croak "'$which' option must be a CODE reference"
+              if reftype $args{$which} ne 'CODE';
+        }
+    }
 
     # create an object for the class method
     if ( !ref $self ) {
