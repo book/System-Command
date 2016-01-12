@@ -322,6 +322,9 @@ sub loop_on {
             croak "'$which' option must be a CODE reference"
               if reftype $args{$which} ne 'CODE';
         }
+        else {
+            delete $args{$which};
+        }
     }
 
     # create an object for the class method
