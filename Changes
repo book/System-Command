@@ -1,6 +1,8 @@
 Revision history for System-Command
 
 {{$NEXT}}
+    [ENHANCEMENT]
+    - New method loop_on() allows to run callbacks on the output/errput
 
 1.116 Sun Jan 3 2016
     [BUG FIX]
