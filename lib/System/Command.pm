@@ -345,8 +345,10 @@ sub loop_on {
         for my $fh (@ready) {
             my $which = $fh == $self->stdout ? 'stdout' : 'stderr';
             if ( defined( my $line = <$fh> ) ) {
-                $args{$which}->($line)
+                my $ret = 1;
+                $ret = $args{$which}->($line)
                   if exists $args{$which};
+                return if !$ret;
             }
             else {
                 $select->remove($fh);
@@ -608,7 +610,8 @@ completion:
     $cmd->loop_on( stderr => '' );
 
 The method blocks until the command is completed (or rather, until
-its output and errput handles have been closed).
+its output and errput handles have been closed), or until one of the
+callbacks returns a false value.
 
 The return value is true if the command exited with status 0, and false
 otherwise (i.e. the Unix traditional definition of success).

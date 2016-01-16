@@ -20,3 +20,14 @@ $cmd->loop_on(
     stderr =>
       sub { like( shift, qr/^STDERR line $e$/, "STDERR line $e" ); $e++ },
 );
+
+# early abort
+my $c = 0;
+$cmd = System::Command->new( @cmd, 10, 10 );
+$cmd->loop_on(
+    stdout => sub { return !( ++$c == 5 ) },
+    stderr => ''
+);
+is( $c, 5, 'Aborted after 5 lines' );
+
+like( $cmd->stdout->getline, qr/^STDOUT line 6/, 'Command still runs' );
