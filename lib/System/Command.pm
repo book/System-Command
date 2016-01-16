@@ -587,6 +587,34 @@ attributes, in that order.
 
 (Added in version 1.01.)
 
+=head2 loop_on
+
+    $cmd->loop_on(
+        stdout => sub { ... },
+        stderr => sub { ... },
+    );
+
+This method calls the corresponding code references with each line
+produced on the standard output and errput of the command.
+
+If the C<stdout> or C<stderr> argument is not given, the default is to
+silently drop the data for C<stdout>, and to pass through (to STDERR)
+the data for C<stderr>. To prevent any processing, pass a false value
+to the parameter.
+
+For example, the following line will silently run the command to
+completion:
+
+    $cmd->loop_on( stderr => '' );
+
+The method blocks until the command is completed (or rather, until
+its output and errput handles have been closed).
+
+The return value is true if the command exited with status 0, and false
+otherwise (i.e. the Unix traditional definition of success).
+
+(Added in version 1.117.)
+
 =head2 Accessors
 
 The attributes of a System::Command object are also accessible
