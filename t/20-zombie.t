@@ -21,8 +21,9 @@ my $status = 1;
 my $delay  = 2;
 
 # this is necessary, because kill(0,pid) is misimplemented in perl core
+# note that tasklist does not provide a return code; pipe to find to obtain return code
 my $_is_alive = $win32
-    ? sub { return `tasklist /FO CSV /NH /fi "PID eq $_[0]"` =~ /^"/ }
+    ? sub { return `tasklist /FO CSV /NH /fi "PID eq $_[0]" 2>NUL | find /I /N "$_[0]" >NUL` }
     : sub { return kill 0, $_[0]; };
 
 # catch warnings
