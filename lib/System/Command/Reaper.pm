@@ -58,7 +58,7 @@ sub _reap {
     my $pid = $self->{pid};
 
     # REPENT/THE END IS/EXTREMELY/FUCKING/NIGH
-    if ( my $reaped = waitpid( $pid, $flags ) and !exists $self->{exit} ) {
+    if ( !exists $self->{exit} and my $reaped = waitpid( $pid, $flags ) ) {
 
         # Well, it's a puzzle because, technically, you're not alive.
         my $zed = $reaped == $pid;
