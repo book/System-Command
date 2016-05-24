@@ -357,6 +357,9 @@ sub loop_on {
         }
     }
 
+    # close all pipes and wait for the child to terminate
+    $self->close;
+
     # success in the Unix sense
     return defined $self->exit && $self->exit == 0;
 }
