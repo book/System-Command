@@ -358,7 +358,7 @@ sub loop_on {
     }
 
     # success in the Unix sense
-    return $self->exit == 0;
+    return defined $self->exit && $self->exit == 0;
 }
 
 # delegate those to the reaper (when there's one)
