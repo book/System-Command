@@ -791,7 +791,7 @@ L<http://search.cpan.org/dist/System-Command/>
 
 =head1 COPYRIGHT
 
-Copyright 2010-2015 Philippe Bruhat (BooK).
+Copyright 2010-2016 Philippe Bruhat (BooK).
 
 =head1 LICENSE
 
