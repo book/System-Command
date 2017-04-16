@@ -43,6 +43,16 @@ sub import {
     }
 }
 
+sub taint_var {
+    my ($var) = @_;
+    if ($var =~ m|\A([ /A-Z0-9_.-]+)\Z|i ) {
+        $var = $1;
+        return $var;
+    } else {
+        croak "[TAINT] Bad variable content: $var \n";
+    }
+}
+
 # a few simple accessors
 {
     no strict 'refs';
@@ -148,6 +158,9 @@ my $_spawn = sub {
                 open \*STDERR, ">&=$fd_ERR"
                     or croak "Can't open( \\*STDERR, '<&=$fd_ERR' ): $!";
 
+                for (my $i=0;$i< scalar @cmd; $i++){
+                    $cmd[$i] = taint_var($cmd[$i]);
+                }
                 # and finally, exec into @cmd
                 exec( { $cmd[0] } @cmd )
                     or do { croak "Can't exec( @cmd ): $!"; }
@@ -219,9 +232,9 @@ sub new {
     my $orig = cwd;
     my $dest = defined $o->{cwd} ? $o->{cwd} : undef;
     if ( defined $dest ) {
+        $dest = taint_var($dest);
         chdir $dest or croak "Can't chdir to $dest: $!";
     }
-
     # keep changes to the environment local
     local %ENV = %ENV;
 
@@ -283,6 +296,7 @@ sub new {
 
     # chdir back to origin
     if ( defined $dest ) {
+        $orig = taint_var($orig);
         chdir $orig or croak "Can't chdir back to $orig: $!";
     }
 
