@@ -1,6 +1,8 @@
 Revision history for System-Command
 
 {{$NEXT}}
+    [BUG FIX]
+    - ensure test counts and skip counts remain tied together (MITHALDU)
 
 1.118 Thu Jun 2 2016
     [ENHANCEMENTS]
