@@ -157,17 +157,18 @@ for my $t ( @tests, @fail ) {SKIP:{
     my $w32env = {};
     $w32env = { PWD => $t->{options}{cwd} }
         if MSWin32 && exists $t->{options}{cwd};
-    is_deeply(
-        $info,
-        {   argv  => [],
-            cwd   => $t->{options}{cwd} || $cwd,
-            env   => { %$env, %$w32env },
-            input => $t->{options}{input} || '',
-            name  => $t->{name} || $name,
-            pid   => $cmd->pid,
-        },
-        "perl $name"
-    );
+    my $expected = {   argv  => [],
+        cwd   => $t->{options}{cwd} || $cwd,
+        env   => { %$env, %$w32env },
+        input => $t->{options}{input} || '',
+        name  => $t->{name} || $name,
+        pid   => $cmd->pid,
+    };
+    is_deeply($info, $expected, "perl $name") or do {
+        diag '$t: ', explain $t;
+        diag '$info: ', explain $info;
+        diag '$expected: ', explain $expected;
+    };
 
     # close and check
     my $reaper = $cmd->close();
