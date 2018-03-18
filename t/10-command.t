@@ -152,6 +152,11 @@ for my $t ( @tests, @fail ) {SKIP:{
         for grep { !defined $t->{options}{env}{$_} }
         keys %{ $t->{options}{env} || {} };
     delete $env->{$_} for grep /^CONEMU/, keys %ENV;
+    if (MSWin32) {
+        # env vars can't be empty strings on Win32
+        # seems GNU make is adding an empty-string MFLAGS env-var which causes mayhem
+        delete $env->{$_} for grep !length $env->{$_}, keys %$env;
+    }
     my $info;
     eval $output;
     my $w32env = {};
