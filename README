@@ -15,7 +15,7 @@ SYNOPSIS
     # $cmd is basically a hash, with keys / accessors
     $cmd->stdin();     # filehandle to the process stdin (write)
     $cmd->stdout();    # filehandle to the process stdout (read)
-    $cmd->stderr();    # filehandle to the process stdout (read)
+    $cmd->stderr();    # filehandle to the process stderr (read)
     $cmd->pid();       # pid of the child process
 
     # done!
@@ -68,7 +68,7 @@ You can also look for information at:
         http://cpanratings.perl.org/d/System-Command
 
     Search CPAN
-        http://search.cpan.org/dist/System-Command/
+        https://metacpan.org/pod/System::Command/
 
 
 LICENSE AND COPYRIGHT
