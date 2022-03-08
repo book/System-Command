@@ -4,7 +4,7 @@ use warnings;
 use System::Command;
 
 # Adapted from https://github.com/book/System-Command/issues/27
-`perl -Ilib -MSystem::Command -e '
+`$^X -Ilib -MSystem::Command -e '
     my \$out = System::Command->new(qw($^X -e1))->stdout;
     exit 3;
 '`;
